@@ -123,3 +123,4 @@ More specifically, for every state, run a different algorithm that worked well s
 - [Using Artifical Intelligent to solve the game of 2048](https://home.cse.ust.hk/~yqsong/teaching/comp3211/projects/2017Fall/G11.pdf)
 - [AI plays 2048](http://cs229.stanford.edu/proj2016/report/NieHouAn-AIPlays2048-report.pdf)
 - [Artificial Intelligence has crushed all human records in 2048](http://www.randalolson.com/2015/04/27/artificial-intelligence-has-crushed-all-human-records-in-2048-heres-how-the-ai-pulled-it-off/)
+- [Deep Refrocement Learning for 2048](https://www.mit.edu/~adedieu/pdf/2048.pdf)
