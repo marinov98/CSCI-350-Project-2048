@@ -57,10 +57,10 @@ class PlayerAI(BaseAI):
         return score
 
     def monotonicPatternHeuristic(self,grid):
-        """ Heuristic that tries to ensure that the tiles follow a pattern """
+        """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
         score = 0
 
-        # I want the tiles to keep the highest number in the upper right corner 
+        # I want the tiles to keep the highest number in the lower left corner 
         score += grid.getCellValue((0, 0)) * 81
         score += grid.getCellValue((0, 1)) * 49
         score += grid.getCellValue((0, 2)) * 0
