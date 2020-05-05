@@ -26,7 +26,7 @@ class PlayerAI(BaseAI):
 
     def getHeuristics(self,grid):
         """ Returns weighted sum of the 5 heuristics """
-        return self.snakePatternHeuristic(grid)
+        return self.monotonicPatternHeuristic(grid)
 
 #######################################
 ## Heuristics
@@ -73,8 +73,8 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((2, 1)) * 121
         score += grid.getCellValue((2, 2)) * 81
         score += grid.getCellValue((2, 3)) * 49
-        score += grid.getCellValue((3, 0)) * 225
-        score += grid.getCellValue((3, 1)) * 196
+        score += grid.getCellValue((3, 0)) * 225 # corner
+        score += grid.getCellValue((3, 1)) * 169
         score += grid.getCellValue((3, 2)) * 121
         score += grid.getCellValue((3, 3)) * 81
 
@@ -130,10 +130,11 @@ class PlayerAI(BaseAI):
             # return weighted average 
             return avg / (0.9 * twos + 0.1 * fours), 0
 
-    def alphaBeta(self, grid, isMaxPlayer=True, depth=4, alpha=-1 * float("inf"), beta=float("inf")):
+    def alphaBeta(self, grid, isMaxPlayer=True, depth=5, alpha=-1 * float("inf"), beta=float("inf")):
         """ Performs minimax with alpha beta pruning """
 
-        playerMoveset = grid.getAvailableMoves()
+        # Order of moves (DOWN, LEFT, RIGHT, UP)
+        playerMoveset = grid.getAvailableMoves([1,2,3,0])
 
         # base case
         if depth == 0 or process_time() - self.startTime > 0.15 or not playerMoveset:
@@ -183,9 +184,9 @@ class PlayerAI(BaseAI):
     def expectiAlphaBeta(self, grid, node=1, depth=3, alpha=-1 * float("inf"), beta=float("inf")):
         """ Performs expectimax with alpha beta pruning """
 
-        # Order of moves (UP, RIGHT, LEFT,DOWN)
-        playerMoveset = grid.getAvailableMoves([0,3,2,1])
-         
+        # Order of moves (DOWN, LEFT, RIGHT, UP)
+        playerMoveset = grid.getAvailableMoves([1,2,3,0])
+
         # base case
         if depth == 0 or process_time() - self.startTime > 0.15 or not playerMoveset:
             return self.getHeuristics(grid), 0
