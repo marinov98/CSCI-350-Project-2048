@@ -26,107 +26,63 @@ class PlayerAI(BaseAI):
 
     def getHeuristics(self,grid):
         """ Returns weighted sum of the 5 heuristics """
-        return (self.monotonicHeuristic(grid) * 3 + self.openHeuristic(grid) * 4 + self.mergeHeuristic(grid)
-               + self.patternHeuristic(grid) * 2 - self.clusterHeuristic(grid) * 5)
+        return self.snakePatternHeuristic(grid)
 
-    def monotonicHeuristic(self, grid):
-        """ This heuristic tries to ensure tiles align monotonically """
+#######################################
+## Heuristics
+#######################################
+
+    def snakePatternHeuristic(self,grid):
+        """ Snake weighted matrix pattern heuristic """
         score = 0
 
-        multiplierL = 4
-        multiplierR = 4
-
-        for i in range(3):
-
-            # this means the desired pattern stopped holding
-            if (multiplierR == 0):
-                break
-
-            # these vars will be used for comparison between the values on the upper edge
-            currR = grid.getCellValue((0, 3 - i))
-            prevR = grid.getCellValue((0, 3 - i - 1))
-
-            if currR >= prevR:
-                score += currR * multiplierR
-                multiplierR *= 2
-            else:
-                multiplierR = 0
+        # I want the tiles to keep the highest number in the lower left corner 
+        score += grid.getCellValue((0, 0)) * 0
+        score += grid.getCellValue((0, 1)) * 1
+        score += grid.getCellValue((0, 2)) * 4
+        score += grid.getCellValue((0, 3)) * 9
+        score += grid.getCellValue((1, 0)) * 49
+        score += grid.getCellValue((1, 1)) * 36
+        score += grid.getCellValue((1, 2)) * 25
+        score += grid.getCellValue((1, 3)) * 16
+        score += grid.getCellValue((2, 0)) * 64
+        score += grid.getCellValue((2, 1)) * 81
+        score += grid.getCellValue((2, 2)) * 100
+        score += grid.getCellValue((2, 3)) * 121
+        score += grid.getCellValue((3, 0)) * 225 # corner
+        score += grid.getCellValue((3, 1)) * 196
+        score += grid.getCellValue((3, 2)) * 169
+        score += grid.getCellValue((3, 3)) * 144
 
         return score
 
-
-    def clusterHeuristic(self,grid):
-        """ Heuristic that penalizes tiles that have a big difference with their neightbors """
-
-        penalty = 0
-        for i in range(4):
-            for j in range(4):
-                # check for neighbors...
-                neighborUp = grid.getCellValue((i - 1,j))
-                neighborDown = grid.getCellValue((i + 1,j))
-                neighborLeft = grid.getCellValue((i,j + 1))
-                neighborRight = grid.getCellValue((i,j - 1))
-
-                # Find absolute value of their differences
-                if neighborUp != None:
-                    penalty = penalty + abs(grid.getCellValue((i,j)) - neighborUp)
-                if neighborDown != None:
-                    penalty = penalty + abs(grid.getCellValue((i,j)) - neighborDown)
-                if neighborLeft != None:
-                    penalty = penalty + abs(grid.getCellValue((i,j)) - neighborLeft)
-                if neighborRight != None:
-                    penalty = penalty + abs(grid.getCellValue((i,j)) - neighborRight)
-
-        # this will be assigned a negative because we are penalizing
-        return penalty
-
-
-    def patternHeuristic(self,grid):
+    def monotonicPatternHeuristic(self,grid):
         """ Heuristic that tries to ensure that the tiles follow a pattern """
         score = 0
 
         # I want the tiles to keep the highest number in the upper right corner 
-        score += grid.getCellValue((0, 0)) * 144
-        score += grid.getCellValue((0, 1)) * 169
-        score += grid.getCellValue((0, 2)) * 196
-        score += grid.getCellValue((0, 3)) * 225  # corner
+        score += grid.getCellValue((0, 0)) * 81
+        score += grid.getCellValue((0, 1)) * 49
+        score += grid.getCellValue((0, 2)) * 0
+        score += grid.getCellValue((0, 3)) * 0
         score += grid.getCellValue((1, 0)) * 121
-        score += grid.getCellValue((1, 1)) * 100
-        score += grid.getCellValue((1, 2)) * 81
-        score += grid.getCellValue((1, 3)) * 64
-        score += grid.getCellValue((2, 0)) * 16
-        score += grid.getCellValue((2, 1)) * 25
-        score += grid.getCellValue((2, 2)) * 36
+        score += grid.getCellValue((1, 1)) * 81
+        score += grid.getCellValue((1, 2)) * 49
+        score += grid.getCellValue((1, 3)) * 0
+        score += grid.getCellValue((2, 0)) * 169
+        score += grid.getCellValue((2, 1)) * 121
+        score += grid.getCellValue((2, 2)) * 81
         score += grid.getCellValue((2, 3)) * 49
-        score += grid.getCellValue((3, 0)) * 0
-        score += grid.getCellValue((3, 1)) * 1
-        score += grid.getCellValue((3, 2)) * 4
-        score += grid.getCellValue((3, 3)) * 9
+        score += grid.getCellValue((3, 0)) * 225
+        score += grid.getCellValue((3, 1)) * 196
+        score += grid.getCellValue((3, 2)) * 121
+        score += grid.getCellValue((3, 3)) * 81
 
         return score
 
-
-    def openHeuristic(self,grid):
-        """ Heuristic that grants bonuses for the number of available tiles"""
-        return len(grid.getAvailableCells()) * 50
-
-
-    def mergeHeuristic(self,grid):
-        """ Heuristics that rewards for the same values next to each other """
-        score = 0
-        for i in range(4):
-            for j in range(4):
-                curr = grid.getCellValue((i,j))
-                neighborUp = grid.getCellValue((i - 1,j))
-                neighborDown = grid.getCellValue((i + 1,j))
-                neighborLeft = grid.getCellValue((i,j + 1))
-                neighborRight = grid.getCellValue((i,j - 1))
-
-                if curr == neighborUp or curr == neighborDown or curr == neighborLeft or curr == neighborRight:
-                    score += curr * 50
-
-        return score
-
+#######################################
+## Algorithms
+#######################################
 
     def expectimax(self, grid, isMaxPlayer=True, depth=4):
         """ performs expectimax algorithm to determine best move """
