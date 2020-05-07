@@ -1,5 +1,4 @@
-# Marin Pavlinov Marinov
-# CSCI 350 Homework 2
+# Final AI Project
 
 from BaseAI_3 import BaseAI
 from time import process_time
