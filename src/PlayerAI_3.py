@@ -20,13 +20,13 @@ class PlayerAI(BaseAI):
         self.startTime = process_time()
 
         # get the move from search algorithm
-        move = (self.expectiAlphaBeta(grid))[1]
+        move = (self.expectimax(grid))[1]
 
         return move
 
     def getHeuristics(self,grid):
         """ Returns weighted sum of the 5 heuristics """
-        return self.monotonicPatternHeuristic(grid)
+        return self.snakePatternHeuristic(grid) * 5 + self.mergeHeuristic(grid)
 
 #######################################
 ## Heuristics
@@ -37,22 +37,22 @@ class PlayerAI(BaseAI):
         score = 0
 
         # I want the tiles to keep the highest number in the lower left corner 
-        score += grid.getCellValue((0, 0)) * 0
-        score += grid.getCellValue((0, 1)) * 1
-        score += grid.getCellValue((0, 2)) * 4
-        score += grid.getCellValue((0, 3)) * 9
-        score += grid.getCellValue((1, 0)) * 49
-        score += grid.getCellValue((1, 1)) * 36
-        score += grid.getCellValue((1, 2)) * 25
-        score += grid.getCellValue((1, 3)) * 16
-        score += grid.getCellValue((2, 0)) * 64
-        score += grid.getCellValue((2, 1)) * 81
-        score += grid.getCellValue((2, 2)) * 100
-        score += grid.getCellValue((2, 3)) * 121
-        score += grid.getCellValue((3, 0)) * 225 # corner
-        score += grid.getCellValue((3, 1)) * 196
-        score += grid.getCellValue((3, 2)) * 169
-        score += grid.getCellValue((3, 3)) * 144
+        score += grid.getCellValue((0, 0)) * 1
+        score += grid.getCellValue((0, 1)) * 4
+        score += grid.getCellValue((0, 2)) * (4 ** 2)
+        score += grid.getCellValue((0, 3)) * (4 ** 3)
+        score += grid.getCellValue((1, 0)) * (4 ** 7)
+        score += grid.getCellValue((1, 1)) * (4 ** 6)
+        score += grid.getCellValue((1, 2)) * (4 ** 5)
+        score += grid.getCellValue((1, 3)) * (4 ** 4)
+        score += grid.getCellValue((2, 0)) * (4 ** 8)
+        score += grid.getCellValue((2, 1)) * (4 ** 9)
+        score += grid.getCellValue((2, 2)) * (4 ** 10)
+        score += grid.getCellValue((2, 3)) * (4 ** 11)
+        score += grid.getCellValue((3, 0)) * (4 ** 15) # corner
+        score += grid.getCellValue((3, 1)) * (4 ** 14)
+        score += grid.getCellValue((3, 2)) * (4 ** 13)
+        score += grid.getCellValue((3, 3)) * (4 ** 12)
 
         return score
 
@@ -61,22 +61,38 @@ class PlayerAI(BaseAI):
         score = 0
 
         # I want the tiles to keep the highest number in the lower left corner 
-        score += grid.getCellValue((0, 0)) * 81
-        score += grid.getCellValue((0, 1)) * 49
-        score += grid.getCellValue((0, 2)) * 0
-        score += grid.getCellValue((0, 3)) * 0
-        score += grid.getCellValue((1, 0)) * 121
-        score += grid.getCellValue((1, 1)) * 81
-        score += grid.getCellValue((1, 2)) * 49
-        score += grid.getCellValue((1, 3)) * 0
-        score += grid.getCellValue((2, 0)) * 169
-        score += grid.getCellValue((2, 1)) * 121
-        score += grid.getCellValue((2, 2)) * 81
-        score += grid.getCellValue((2, 3)) * 49
-        score += grid.getCellValue((3, 0)) * 225 # corner
-        score += grid.getCellValue((3, 1)) * 169
-        score += grid.getCellValue((3, 2)) * 121
-        score += grid.getCellValue((3, 3)) * 81
+        score += grid.getCellValue((0, 0)) * (4 ** 3)
+        score += grid.getCellValue((0, 1)) * (4 ** 2)
+        score += grid.getCellValue((0, 2)) * 4
+        score += grid.getCellValue((0, 3)) * 1
+        score += grid.getCellValue((1, 0)) * (4 ** 4)
+        score += grid.getCellValue((1, 1)) * (4 ** 3)
+        score += grid.getCellValue((1, 2)) * (4 ** 2)
+        score += grid.getCellValue((1, 3)) * 4
+        score += grid.getCellValue((2, 0)) * (4 ** 5)
+        score += grid.getCellValue((2, 1)) * (4 ** 4)
+        score += grid.getCellValue((2, 2)) * (4 ** 3)
+        score += grid.getCellValue((2, 3)) * (4 ** 2)
+        score += grid.getCellValue((3, 0)) * (4 ** 6) # corner
+        score += grid.getCellValue((3, 1)) * (4 ** 5)
+        score += grid.getCellValue((3, 2)) * (4 ** 4)
+        score += grid.getCellValue((3, 3)) * (4 ** 3)
+
+        return score
+
+    def mergeHeuristic(self,grid):
+        """ Heuristics that rewards for the same values next to each other """
+        score = 0
+        for i in range(4):
+            for j in range(4):
+                curr = grid.getCellValue((i,j))
+                neighborUp = grid.getCellValue((i - 1,j))
+                neighborDown = grid.getCellValue((i + 1,j))
+                neighborLeft = grid.getCellValue((i,j + 1))
+                neighborRight = grid.getCellValue((i,j - 1))
+
+                if curr == neighborUp or curr == neighborDown or curr == neighborLeft or curr == neighborRight:
+                    score += curr * (4 ** 8)
 
         return score
 
