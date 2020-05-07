@@ -1,5 +1,4 @@
-# Marin Pavlinov Marinov
-# CSCI 350 Homework 2
+# Final AI Project
 
 from BaseAI_3 import BaseAI
 from time import process_time
@@ -20,13 +19,13 @@ class PlayerAI(BaseAI):
         self.startTime = process_time()
 
         # get the move from search algorithm
-        move = (self.expectimax(grid))[1]
+        move = (self.expectiAlphaBeta(grid))[1]
 
         return move
 
     def getHeuristics(self,grid):
         """ Returns weighted sum of the 5 heuristics """
-        return self.snakePatternHeuristic(grid) * 5 + self.mergeHeuristic(grid)
+        return self.snakePatternHeuristic(grid) * 3 + self.mergeHeuristic(grid) * 2 + self.openHeuristic(grid)
 
 #######################################
 ## Heuristics
@@ -95,6 +94,10 @@ class PlayerAI(BaseAI):
                     score += curr * (4 ** 8)
 
         return score
+
+    def openHeuristic(self,grid):
+        """ Heuristic that grants bonuses for the number of available tiles"""
+        return len(grid.getAvailableCells()) * (4 ** 10)
 
 #######################################
 ## Algorithms
@@ -197,14 +200,14 @@ class PlayerAI(BaseAI):
     # The parameter node takes the following values (I found this to perform better than True and False for some reason)
     # 1 = max node
     # 2 = chance node
-    def expectiAlphaBeta(self, grid, node=1, depth=3, alpha=-1 * float("inf"), beta=float("inf")):
+    def expectiAlphaBeta(self, grid, node=1, depth=5, alpha=-1 * float("inf"), beta=float("inf")):
         """ Performs expectimax with alpha beta pruning """
 
         # Order of moves (DOWN, LEFT, RIGHT, UP)
         playerMoveset = grid.getAvailableMoves([1,2,3,0])
 
         # base case
-        if depth == 0 or process_time() - self.startTime > 0.15 or not playerMoveset:
+        if depth == 0 or not playerMoveset:
             return self.getHeuristics(grid), 0
 
         if node == 1:
