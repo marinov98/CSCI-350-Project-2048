@@ -25,7 +25,7 @@ class PlayerAI(BaseAI):
 
     def getHeuristics(self,grid):
         """ Returns weighted sum of the 5 heuristics """
-        return self.monotonicPatternHeuristic(grid)
+        return self.snakePatternHeuristic(grid)
 
 #######################################
 ## Heuristics
@@ -180,14 +180,14 @@ class PlayerAI(BaseAI):
     # The parameter node takes the following values (I found this to perform better than True and False for some reason)
     # 1 = max node
     # 2 = chance node
-    def expectiAlphaBeta(self, grid, node=1, depth=3, alpha=-1 * float("inf"), beta=float("inf")):
+    def expectiAlphaBeta(self, grid, node=1, depth=5, alpha=-1 * float("inf"), beta=float("inf")):
         """ Performs expectimax with alpha beta pruning """
 
         # Order of moves (DOWN, LEFT, RIGHT, UP)
         playerMoveset = grid.getAvailableMoves([1,2,3,0])
 
         # base case
-        if depth == 0 or process_time() - self.startTime > 0.15 or not playerMoveset:
+        if depth == 0 or not playerMoveset:
             return self.getHeuristics(grid), 0
 
         if node == 1:
