@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [1,1,0,5], memo_dic = {}):
+    def __init__(self, weights = [1,0.1,2,0.1,0.05], memo_dic = {}):
         #store previously computed states to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -251,7 +251,7 @@ class PlayerAI(BaseAI):
 
 
     def heuristic(self, grid):
-        vals = [self.snakePatternHeuristic(grid), self.monotonicHeuristic(grid)]
+        vals = [self.snakePatternHeuristic(grid), self.monotonicHeuristic(grid), self.clusterHeuristic(grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
         #print(vals, sum(vals))
         x = sum(vals[i]*self.weights[i] for i in range(len(vals)))
         '''
@@ -321,14 +321,14 @@ class PlayerAI(BaseAI):
             for j in range(4):
                 curr = grid.getCellValue((i,j))
                 neighborUp = grid.getCellValue((i - 1,j))
-                neighborDown = grid.getCellValue((i + 1,j))
                 neighborLeft = grid.getCellValue((i,j + 1))
+                neighborDown = grid.getCellValue((i + 1,j))
                 neighborRight = grid.getCellValue((i,j - 1))
 
-                if curr == neighborUp or curr == neighborDown or curr == neighborLeft or curr == neighborRight:
+                if curr == neighborUp or curr == neighborLeft or curr == neighborDown or curr == neighborRight:
                     score += curr * (4 ** 8)
 
-        return score / (16 * 4 ** 8)
+        return score / (64 * 2048 * (4 ** 8))
 
     def openHeuristic(self,grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
@@ -358,7 +358,7 @@ class PlayerAI(BaseAI):
                     penalty -= abs(grid.getCellValue((i,j)) - neighborRight)
 
         # this will be assigned a negative because we are penalizing
-        return penalty
+        return penalty / (self.sum_of_tiles(grid) * 64000)
 
     def monotonicHeuristic(self, grid):
         """ Ensure tiles align monotonically """
