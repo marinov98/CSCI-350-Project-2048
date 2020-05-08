@@ -19,9 +19,9 @@ class PlayerAI(BaseAI):
         self.startTime = process_time()
 
         # get the move from search algorithm
-        maxScore, move = self.expectiAlphaBeta(grid)
+        move = (self.expectiAlphaBeta(grid))[1]
 
-        return maxScore, move
+        return move
 
     def getHeuristics(self,grid):
         """ Returns weighted sum of the 5 heuristics """
