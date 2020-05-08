@@ -8,9 +8,10 @@ import random
 import math
 import time
 from BaseAI_3 import BaseAI
-
+from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
+
     def __init__(self, weights = [1,1,0,5], memo_dic = {}):
         #store previously computed states to reduce redundant computation
         self.memo = memo_dic
@@ -20,10 +21,11 @@ class PlayerAI(BaseAI):
         #weights for the heuristic
         self.weights = list(weights)
         #time limit to make sure we don't use too much time
-        self.time_limit = .18
+        self.time_limit = 1.8
         #upper bound on heuristic function for alpha-beta pruning (only for expectimax)
-        self.UPPER_BOUND = 17
-        #self.max_heur = -float('inf')
+        self.UPPER_BOUND = 2
+        self.max_heur = -float('inf')
+
     def getMove(self, grid):
         #initialize time
         '''
@@ -35,9 +37,14 @@ class PlayerAI(BaseAI):
         '''
         self.timer = time.process_time()
         return self.iterative_deepening_expectimax(grid,1,4)
+      # return (Marinov.expectiAlphaBeta(Marinov,grid))[1]
         #return self.iterative_deepening_minimax(grid,1,4)
         #return self.minimax(grid, 3, True, -float('inf'), float('inf'))[1]
         #return self.expectimax(grid, 3, True, -float('inf'), float('inf'))[1]
+
+#######################################
+## Algorithms
+#######################################
 
     #iterative deepening search with minimax
     def iterative_deepening_minimax(self, grid, start, end):
@@ -244,7 +251,7 @@ class PlayerAI(BaseAI):
 
 
     def heuristic(self, grid):
-        vals = [self.h1(grid), self.h2(grid), self.h3(grid), self.h4(grid)]
+        vals = [self.snakePatternHeuristic(grid), self.monotonicHeuristic(grid)]
         #print(vals, sum(vals))
         x = sum(vals[i]*self.weights[i] for i in range(len(vals)))
         '''
@@ -253,6 +260,9 @@ class PlayerAI(BaseAI):
             print(self.max_heur)
             print(grid.map)
         '''
+        if x > self.max_heur:
+            self.max_heur = x
+
         return x
 # Marin
 
@@ -278,7 +288,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 13)
         score += grid.getCellValue((3, 3)) * (4 ** 12)
 
-        return score / (4 ** 15)
+        return score / (8192 * (4 ** 15))
 
     def monotonicPatternHeuristic(self,grid):
         """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
@@ -318,11 +328,11 @@ class PlayerAI(BaseAI):
                 if curr == neighborUp or curr == neighborDown or curr == neighborLeft or curr == neighborRight:
                     score += curr * (4 ** 8)
 
-        return score
+        return score / (16 * 4 ** 8)
 
     def openHeuristic(self,grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
-        return len(grid.getAvailableCells()) * (4 ** 5)
+        return len(grid.getAvailableCells()) / 16
 
 
     def clusterHeuristic(self,grid):
@@ -349,3 +359,26 @@ class PlayerAI(BaseAI):
 
         # this will be assigned a negative because we are penalizing
         return penalty
+
+    def monotonicHeuristic(self, grid):
+        """ Ensure tiles align monotonically """
+        score = 0
+
+        multiplier = 4
+
+        for i in range(3):
+            if multiplier == 0:
+                break
+
+            # these vars will be used for comparison between the values on lower edge
+            curr = grid.getCellValue((3, 0 + i))
+            prev = grid.getCellValue((3, 0 + i + 1))
+
+            if curr >= prev:
+                score += curr * multiplier
+                multiplier *= 2
+            else:
+                multiplier = 0
+
+        return score / (4096 * 4 + 2048 * 8 + 1024 * 16 + 512 * 32)
+
