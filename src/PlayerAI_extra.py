@@ -206,7 +206,10 @@ class PlayerAI(BaseAI):
                     self.memo[(tuple(tuple(row) for row in grid.map), i, playerTurn)] = (avgVal, 0)
             return (avgVal,0)
 
-
+#######################################
+## Heuristics
+#######################################
+# Aryan
     #number of empty cells
     def h1(self, grid):
         return len(grid.getAvailableCells()) / 16
@@ -251,4 +254,98 @@ class PlayerAI(BaseAI):
             print(grid.map)
         '''
         return x
+# Marin
 
+    def snakePatternHeuristic(self,grid):
+        """ Snake weighted matrix pattern heuristic """
+        score = 0
+
+        # I want the tiles to keep the highest number in the lower left corner 
+        score += grid.getCellValue((0, 0)) * 1
+        score += grid.getCellValue((0, 1)) * 4
+        score += grid.getCellValue((0, 2)) * (4 ** 2)
+        score += grid.getCellValue((0, 3)) * (4 ** 3)
+        score += grid.getCellValue((1, 0)) * (4 ** 7)
+        score += grid.getCellValue((1, 1)) * (4 ** 6)
+        score += grid.getCellValue((1, 2)) * (4 ** 5)
+        score += grid.getCellValue((1, 3)) * (4 ** 4)
+        score += grid.getCellValue((2, 0)) * (4 ** 8)
+        score += grid.getCellValue((2, 1)) * (4 ** 9)
+        score += grid.getCellValue((2, 2)) * (4 ** 10)
+        score += grid.getCellValue((2, 3)) * (4 ** 11)
+        score += grid.getCellValue((3, 0)) * (4 ** 15) # corner
+        score += grid.getCellValue((3, 1)) * (4 ** 14)
+        score += grid.getCellValue((3, 2)) * (4 ** 13)
+        score += grid.getCellValue((3, 3)) * (4 ** 12)
+
+        return score / (4 ** 15)
+
+    def monotonicPatternHeuristic(self,grid):
+        """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
+        score = 0
+
+        # I want the tiles to keep the highest number in the lower left corner 
+        score += grid.getCellValue((0, 0)) * (4 ** 3)
+        score += grid.getCellValue((0, 1)) * (4 ** 2)
+        score += grid.getCellValue((0, 2)) * 4
+        score += grid.getCellValue((0, 3)) * 1
+        score += grid.getCellValue((1, 0)) * (4 ** 4)
+        score += grid.getCellValue((1, 1)) * (4 ** 3)
+        score += grid.getCellValue((1, 2)) * (4 ** 2)
+        score += grid.getCellValue((1, 3)) * 4
+        score += grid.getCellValue((2, 0)) * (4 ** 5)
+        score += grid.getCellValue((2, 1)) * (4 ** 4)
+        score += grid.getCellValue((2, 2)) * (4 ** 3)
+        score += grid.getCellValue((2, 3)) * (4 ** 2)
+        score += grid.getCellValue((3, 0)) * (4 ** 6) # corner
+        score += grid.getCellValue((3, 1)) * (4 ** 5)
+        score += grid.getCellValue((3, 2)) * (4 ** 4)
+        score += grid.getCellValue((3, 3)) * (4 ** 3)
+
+        return score
+
+    def mergeHeuristic(self,grid):
+        """ Heuristics that rewards for the same values next to each other """
+        score = 0
+        for i in range(4):
+            for j in range(4):
+                curr = grid.getCellValue((i,j))
+                neighborUp = grid.getCellValue((i - 1,j))
+                neighborDown = grid.getCellValue((i + 1,j))
+                neighborLeft = grid.getCellValue((i,j + 1))
+                neighborRight = grid.getCellValue((i,j - 1))
+
+                if curr == neighborUp or curr == neighborDown or curr == neighborLeft or curr == neighborRight:
+                    score += curr * (4 ** 8)
+
+        return score
+
+    def openHeuristic(self,grid):
+        """ Heuristic that grants bonuses for the number of available tiles"""
+        return len(grid.getAvailableCells()) * (4 ** 5)
+
+
+    def clusterHeuristic(self,grid):
+        """ Heuristic that penalizes tiles that have a big difference with their neightbors """
+
+        penalty = 0
+        for i in range(4):
+            for j in range(4):
+                # check for neighbors...
+                neighborUp = grid.getCellValue((i - 1,j))
+                neighborDown = grid.getCellValue((i + 1,j))
+                neighborLeft = grid.getCellValue((i,j + 1))
+                neighborRight = grid.getCellValue((i,j - 1))
+
+                # Find absolute value of their differences
+                if neighborUp != None:
+                    penalty -= abs(grid.getCellValue((i,j)) - neighborUp)
+                if neighborDown != None:
+                    penalty -= abs(grid.getCellValue((i,j)) - neighborDown)
+                if neighborLeft != None:
+                    penalty -= abs(grid.getCellValue((i,j)) - neighborLeft)
+                if neighborRight != None:
+                    penalty -= abs(grid.getCellValue((i,j)) - neighborRight)
+
+        # this will be assigned a negative because we are penalizing
+        return penalty
