@@ -20,7 +20,7 @@ actionDic = {
 (PLAYER_TURN, COMPUTER_TURN) = (0, 1)
 
 # Time Limit Before Losing
-timeLimit = 0.2
+timeLimit = 0.5
 allowance = 0.05
 maxTime   = timeLimit + allowance
 
@@ -60,6 +60,7 @@ class GameManager:
         """ Main method that handles running the game of 2048 """
 
         # Initialize the game
+        maxHeuristic = 0
         self.insertRandomTiles(self.initTiles)
         self.displayer.display(self.grid)
         turn          = PLAYER_TURN # Player AI Goes First
@@ -73,8 +74,8 @@ class GameManager:
 
             if turn == PLAYER_TURN:
                 print("Player's Turn: ", end="")
-                move = self.playerAI.getMove(gridCopy)
-                
+                maxScore, move = self.playerAI.getMove(gridCopy)
+                maxHeuristic = max(maxHeuristic, maxScore)
                 print(actionDic[move])
 
                 # If move is valid, attempt to move the grid
@@ -107,7 +108,7 @@ class GameManager:
             self.updateAlarm()
             turn = 1 - turn
 
-        return self.grid.getMaxTile()
+        return self.grid.getMaxTile(), maxHeuristic
 
 def main():
     playerAI    = PlayerAI()
@@ -115,8 +116,9 @@ def main():
     displayer   = Displayer()
     gameManager = GameManager(4, playerAI, computerAI, displayer)
 
-    maxTile     = gameManager.start()
+    maxTile, maxHeuristic = gameManager.start()
     print(maxTile)
+    print("Maximum heuristic: {}".format(maxHeuristic))
 
 if __name__ == '__main__':
     main()

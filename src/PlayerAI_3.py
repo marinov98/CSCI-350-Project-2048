@@ -1,5 +1,4 @@
-# Marin Pavlinov Marinov
-# CSCI 350 Homework 2
+# Final AI Project
 
 from BaseAI_3 import BaseAI
 from time import process_time
@@ -9,7 +8,7 @@ class PlayerAI(BaseAI):
 
     def __init__(self):
         # bounds picked as a result of the highest and lowest values found after 25 runs
-        self.upperBound = 36000000
+        self.upperBound = 8000
 
         # start time will be used to ensure algorithm is system invariant
         self.startTime = 0
@@ -26,33 +25,79 @@ class PlayerAI(BaseAI):
 
     def getHeuristics(self,grid):
         """ Returns weighted sum of the 5 heuristics """
-        return (self.monotonicHeuristic(grid) * 3 + self.openHeuristic(grid) * 4 + self.mergeHeuristic(grid)
-               + self.patternHeuristic(grid) * 2 - self.clusterHeuristic(grid) * 5)
+        return self.snakePatternHeuristic(grid)
 
-    def monotonicHeuristic(self, grid):
-        """ This heuristic tries to ensure tiles align monotonically """
+#######################################
+## Heuristics
+#######################################
+
+    def snakePatternHeuristic(self,grid):
+        """ Snake weighted matrix pattern heuristic """
         score = 0
 
-        multiplierL = 4
-        multiplierR = 4
+        # I want the tiles to keep the highest number in the lower left corner 
+        score += grid.getCellValue((0, 0)) * 1
+        score += grid.getCellValue((0, 1)) * 4
+        score += grid.getCellValue((0, 2)) * (4 ** 2)
+        score += grid.getCellValue((0, 3)) * (4 ** 3)
+        score += grid.getCellValue((1, 0)) * (4 ** 7)
+        score += grid.getCellValue((1, 1)) * (4 ** 6)
+        score += grid.getCellValue((1, 2)) * (4 ** 5)
+        score += grid.getCellValue((1, 3)) * (4 ** 4)
+        score += grid.getCellValue((2, 0)) * (4 ** 8)
+        score += grid.getCellValue((2, 1)) * (4 ** 9)
+        score += grid.getCellValue((2, 2)) * (4 ** 10)
+        score += grid.getCellValue((2, 3)) * (4 ** 11)
+        score += grid.getCellValue((3, 0)) * (4 ** 15) # corner
+        score += grid.getCellValue((3, 1)) * (4 ** 14)
+        score += grid.getCellValue((3, 2)) * (4 ** 13)
+        score += grid.getCellValue((3, 3)) * (4 ** 12)
 
-        for i in range(3):
+        return score / (4 ** 15)
 
-            # this means the desired pattern stopped holding
-            if (multiplierR == 0):
-                break
+    def monotonicPatternHeuristic(self,grid):
+        """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
+        score = 0
 
-            # these vars will be used for comparison between the values on the upper edge
-            currR = grid.getCellValue((0, 3 - i))
-            prevR = grid.getCellValue((0, 3 - i - 1))
-
-            if currR >= prevR:
-                score += currR * multiplierR
-                multiplierR *= 2
-            else:
-                multiplierR = 0
+        # I want the tiles to keep the highest number in the lower left corner 
+        score += grid.getCellValue((0, 0)) * (4 ** 3)
+        score += grid.getCellValue((0, 1)) * (4 ** 2)
+        score += grid.getCellValue((0, 2)) * 4
+        score += grid.getCellValue((0, 3)) * 1
+        score += grid.getCellValue((1, 0)) * (4 ** 4)
+        score += grid.getCellValue((1, 1)) * (4 ** 3)
+        score += grid.getCellValue((1, 2)) * (4 ** 2)
+        score += grid.getCellValue((1, 3)) * 4
+        score += grid.getCellValue((2, 0)) * (4 ** 5)
+        score += grid.getCellValue((2, 1)) * (4 ** 4)
+        score += grid.getCellValue((2, 2)) * (4 ** 3)
+        score += grid.getCellValue((2, 3)) * (4 ** 2)
+        score += grid.getCellValue((3, 0)) * (4 ** 6) # corner
+        score += grid.getCellValue((3, 1)) * (4 ** 5)
+        score += grid.getCellValue((3, 2)) * (4 ** 4)
+        score += grid.getCellValue((3, 3)) * (4 ** 3)
 
         return score
+
+    def mergeHeuristic(self,grid):
+        """ Heuristics that rewards for the same values next to each other """
+        score = 0
+        for i in range(4):
+            for j in range(4):
+                curr = grid.getCellValue((i,j))
+                neighborUp = grid.getCellValue((i - 1,j))
+                neighborDown = grid.getCellValue((i + 1,j))
+                neighborLeft = grid.getCellValue((i,j + 1))
+                neighborRight = grid.getCellValue((i,j - 1))
+
+                if curr == neighborUp or curr == neighborDown or curr == neighborLeft or curr == neighborRight:
+                    score += curr * (4 ** 8)
+
+        return score
+
+    def openHeuristic(self,grid):
+        """ Heuristic that grants bonuses for the number of available tiles"""
+        return len(grid.getAvailableCells()) * (4 ** 5)
 
 
     def clusterHeuristic(self,grid):
@@ -80,61 +125,17 @@ class PlayerAI(BaseAI):
         # this will be assigned a negative because we are penalizing
         return penalty
 
+#######################################
+## Algorithms
+#######################################
 
-    def patternHeuristic(self,grid):
-        """ Heuristic that tries to ensure that the tiles follow a pattern """
-        score = 0
-
-        # I want the tiles to keep the highest number in the upper right corner 
-        score += grid.getCellValue((0, 0)) * 144
-        score += grid.getCellValue((0, 1)) * 169
-        score += grid.getCellValue((0, 2)) * 196
-        score += grid.getCellValue((0, 3)) * 225  # corner
-        score += grid.getCellValue((1, 0)) * 121
-        score += grid.getCellValue((1, 1)) * 100
-        score += grid.getCellValue((1, 2)) * 81
-        score += grid.getCellValue((1, 3)) * 64
-        score += grid.getCellValue((2, 0)) * 16
-        score += grid.getCellValue((2, 1)) * 25
-        score += grid.getCellValue((2, 2)) * 36
-        score += grid.getCellValue((2, 3)) * 49
-        score += grid.getCellValue((3, 0)) * 0
-        score += grid.getCellValue((3, 1)) * 1
-        score += grid.getCellValue((3, 2)) * 4
-        score += grid.getCellValue((3, 3)) * 9
-
-        return score
-
-
-    def openHeuristic(self,grid):
-        """ Heuristic that grants bonuses for the number of available tiles"""
-        return len(grid.getAvailableCells()) * 50
-
-
-    def mergeHeuristic(self,grid):
-        """ Heuristics that rewards for the same values next to each other """
-        score = 0
-        for i in range(4):
-            for j in range(4):
-                curr = grid.getCellValue((i,j))
-                neighborUp = grid.getCellValue((i - 1,j))
-                neighborDown = grid.getCellValue((i + 1,j))
-                neighborLeft = grid.getCellValue((i,j + 1))
-                neighborRight = grid.getCellValue((i,j - 1))
-
-                if curr == neighborUp or curr == neighborDown or curr == neighborLeft or curr == neighborRight:
-                    score += curr * 50
-
-        return score
-
-
-    def expectimax(self, grid, isMaxPlayer=True, depth=4):
+    def expectimax(self, grid, isMaxPlayer=True, depth=2):
         """ performs expectimax algorithm to determine best move """
 
         playerMoveset = grid.getAvailableMoves()
 
         # base case
-        if depth == 0 or process_time() - self.startTime > 0.15 or not playerMoveset:
+        if depth == 0 or not playerMoveset:
             return self.getHeuristics(grid), 0
 
         if isMaxPlayer:
@@ -174,13 +175,14 @@ class PlayerAI(BaseAI):
             # return weighted average 
             return avg / (0.9 * twos + 0.1 * fours), 0
 
-    def alphaBeta(self, grid, isMaxPlayer=True, depth=4, alpha=-1 * float("inf"), beta=float("inf")):
+    def alphaBeta(self, grid, isMaxPlayer=True, depth=5, alpha=-1 * float("inf"), beta=float("inf")):
         """ Performs minimax with alpha beta pruning """
 
-        playerMoveset = grid.getAvailableMoves()
+        # Order of moves (DOWN, LEFT, RIGHT, UP)
+        playerMoveset = grid.getAvailableMoves([1,2,3,0])
 
         # base case
-        if depth == 0 or process_time() - self.startTime > 0.15 or not playerMoveset:
+        if depth == 0 or not playerMoveset:
             return self.getHeuristics(grid), 0
 
         if isMaxPlayer:
@@ -224,14 +226,14 @@ class PlayerAI(BaseAI):
     # The parameter node takes the following values (I found this to perform better than True and False for some reason)
     # 1 = max node
     # 2 = chance node
-    def expectiAlphaBeta(self, grid, node=1, depth=3, alpha=-1 * float("inf"), beta=float("inf")):
+    def expectiAlphaBeta(self, grid, node=1, depth=4, alpha=-1 * float("inf"), beta=float("inf")):
         """ Performs expectimax with alpha beta pruning """
 
-        # Order of moves (UP, RIGHT, LEFT,DOWN)
-        playerMoveset = grid.getAvailableMoves([0,3,2,1])
-         
+        # Order of moves (DOWN, LEFT, RIGHT, UP)
+        playerMoveset = grid.getAvailableMoves([1,2,3,0])
+
         # base case
-        if depth == 0 or process_time() - self.startTime > 0.15 or not playerMoveset:
+        if depth == 0 or not playerMoveset:
             return self.getHeuristics(grid), 0
 
         if node == 1:
