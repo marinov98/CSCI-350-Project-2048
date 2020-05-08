@@ -8,7 +8,7 @@ class PlayerAI(BaseAI):
 
     def __init__(self):
         # bounds picked as a result of the highest and lowest values found after 25 runs
-        self.upperBound = 36000000
+        self.upperBound = 536620303000.5
 
         # start time will be used to ensure algorithm is system invariant
         self.startTime = 0
@@ -19,13 +19,13 @@ class PlayerAI(BaseAI):
         self.startTime = process_time()
 
         # get the move from search algorithm
-        move = (self.expectiAlphaBeta(grid))[1]
+        maxScore, move = self.expectiAlphaBeta(grid)
 
-        return move
+        return maxScore, move
 
     def getHeuristics(self,grid):
         """ Returns weighted sum of the 5 heuristics """
-        return self.snakePatternHeuristic(grid) * 3 + self.mergeHeuristic(grid) * 2 + self.openHeuristic(grid)
+        return self.snakePatternHeuristic(grid)
 
 #######################################
 ## Heuristics
@@ -97,19 +97,45 @@ class PlayerAI(BaseAI):
 
     def openHeuristic(self,grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
-        return len(grid.getAvailableCells()) * (4 ** 10)
+        return len(grid.getAvailableCells()) * (4 ** 5)
+
+
+    def clusterHeuristic(self,grid):
+        """ Heuristic that penalizes tiles that have a big difference with their neightbors """
+
+        penalty = 0
+        for i in range(4):
+            for j in range(4):
+                # check for neighbors...
+                neighborUp = grid.getCellValue((i - 1,j))
+                neighborDown = grid.getCellValue((i + 1,j))
+                neighborLeft = grid.getCellValue((i,j + 1))
+                neighborRight = grid.getCellValue((i,j - 1))
+
+                # Find absolute value of their differences
+                if neighborUp != None:
+                    penalty = penalty + abs(grid.getCellValue((i,j)) - neighborUp)
+                if neighborDown != None:
+                    penalty = penalty + abs(grid.getCellValue((i,j)) - neighborDown)
+                if neighborLeft != None:
+                    penalty = penalty + abs(grid.getCellValue((i,j)) - neighborLeft)
+                if neighborRight != None:
+                    penalty = penalty + abs(grid.getCellValue((i,j)) - neighborRight)
+
+        # this will be assigned a negative because we are penalizing
+        return penalty * (-4 ** 10)
 
 #######################################
 ## Algorithms
 #######################################
 
-    def expectimax(self, grid, isMaxPlayer=True, depth=4):
+    def expectimax(self, grid, isMaxPlayer=True, depth=2):
         """ performs expectimax algorithm to determine best move """
 
         playerMoveset = grid.getAvailableMoves()
 
         # base case
-        if depth == 0 or process_time() - self.startTime > 0.15 or not playerMoveset:
+        if depth == 0 or not playerMoveset:
             return self.getHeuristics(grid), 0
 
         if isMaxPlayer:
@@ -156,7 +182,7 @@ class PlayerAI(BaseAI):
         playerMoveset = grid.getAvailableMoves([1,2,3,0])
 
         # base case
-        if depth == 0 or process_time() - self.startTime > 0.15 or not playerMoveset:
+        if depth == 0 or not playerMoveset:
             return self.getHeuristics(grid), 0
 
         if isMaxPlayer:
@@ -200,7 +226,7 @@ class PlayerAI(BaseAI):
     # The parameter node takes the following values (I found this to perform better than True and False for some reason)
     # 1 = max node
     # 2 = chance node
-    def expectiAlphaBeta(self, grid, node=1, depth=5, alpha=-1 * float("inf"), beta=float("inf")):
+    def expectiAlphaBeta(self, grid, node=1, depth=4, alpha=-1 * float("inf"), beta=float("inf")):
         """ Performs expectimax with alpha beta pruning """
 
         # Order of moves (DOWN, LEFT, RIGHT, UP)
