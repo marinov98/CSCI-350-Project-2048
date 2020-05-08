@@ -8,7 +8,7 @@ class PlayerAI(BaseAI):
 
     def __init__(self):
         # bounds picked as a result of the highest and lowest values found after 25 runs
-        self.upperBound = 536620303000.5
+        self.upperBound = 8000
 
         # start time will be used to ensure algorithm is system invariant
         self.startTime = 0
@@ -53,7 +53,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 13)
         score += grid.getCellValue((3, 3)) * (4 ** 12)
 
-        return score
+        return score / (4 ** 15)
 
     def monotonicPatternHeuristic(self,grid):
         """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
@@ -123,7 +123,7 @@ class PlayerAI(BaseAI):
                     penalty = penalty + abs(grid.getCellValue((i,j)) - neighborRight)
 
         # this will be assigned a negative because we are penalizing
-        return penalty * (-4 ** 10)
+        return penalty
 
 #######################################
 ## Algorithms
