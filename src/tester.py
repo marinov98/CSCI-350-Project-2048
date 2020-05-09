@@ -171,7 +171,7 @@ def main():
         displayer   = Displayer()
         gameManager = GameManager(4, playerAI, computerAI, displayer)
         maxTile     = gameManager.start()
-        maxHeur = 0
+        maxHeur = -1 * float("inf")
         maxHeur = max(maxHeur, playerAI.max_heur)
         print(maxTile)
         print(maxHeur)
@@ -180,7 +180,7 @@ def main():
         computerAI  = ComputerAI()
         displayer   = Displayer()
         gameManager = GameManager(4, playerAI, computerAI, displayer)
-        maxHeur = 0
+        maxHeur = -1 * float("inf")
         maxTile = gameManager.start()
         maxHeur = max(maxHeur, playerAI.max_heur)
         print(maxTile)
