@@ -1,6 +1,6 @@
 from Grid_3       import Grid
 from ComputerAI_3 import ComputerAI
-from PlayerAI_3   import PlayerAI
+from PlayerAI_extra import PlayerAI
 from Displayer_3  import Displayer
 
 import time
@@ -171,14 +171,20 @@ def main():
         displayer   = Displayer()
         gameManager = GameManager(4, playerAI, computerAI, displayer)
         maxTile     = gameManager.start()
+        maxHeur = 0
+        maxHeur = max(maxHeur, playerAI.max_heur)
         print(maxTile)
+        print(maxHeur)
     elif sys.argv[1] == 'd':
         playerAI    = PlayerAI()
         computerAI  = ComputerAI()
         displayer   = Displayer()
         gameManager = GameManager(4, playerAI, computerAI, displayer)
-        maxTile     = gameManager.start()
+        maxHeur = 0
+        maxTile = gameManager.start()
+        maxHeur = max(maxHeur, playerAI.max_heur)
         print(maxTile)
+        print(maxHeur)
     elif sys.argv[1] == 't':
         tot = 0
         trials = int(sys.argv[2]) if len(sys.argv) > 2 else 10
