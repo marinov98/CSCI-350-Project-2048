@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [6,2,1,3,0.05], memo_dic = {}):
+    def __init__(self, weights = [5,3,2,4,0.03], memo_dic = {}):
         #store previously computed states to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -21,7 +21,7 @@ class PlayerAI(BaseAI):
         #weights for the heuristic
         self.weights = list(weights)
         #time limit to make sure we don't use too much time
-        self.time_limit = 1.8
+        self.time_limit = 3
         #upper bound on heuristic function for alpha-beta pruning (only for expectimax)
         self.UPPER_BOUND = 8
         self.max_heur = -float('inf')
@@ -36,7 +36,7 @@ class PlayerAI(BaseAI):
             print("ratio: ", self.MemoCalls/self.totalCalls if self.totalCalls!=0 else "totalCalls=0")
         '''
         self.timer = time.process_time()
-        return self.iterative_deepening_expectimax(grid,1,4)
+        return self.iterative_deepening_expectimax(grid,1,6)
       # return (Marinov.expectiAlphaBeta(Marinov,grid))[1]
         #return self.iterative_deepening_minimax(grid,1,4)
         #return self.minimax(grid, 3, True, -float('inf'), float('inf'))[1]
