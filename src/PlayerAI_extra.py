@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [1,0.1,2,0.1,0.05], memo_dic = {}):
+    def __init__(self, weights = [5,2,1,4,0.1], memo_dic = {}):
         #store previously computed states to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -21,9 +21,9 @@ class PlayerAI(BaseAI):
         #weights for the heuristic
         self.weights = list(weights)
         #time limit to make sure we don't use too much time
-        self.time_limit = 1.8
+        self.time_limit = 0.2
         #upper bound on heuristic function for alpha-beta pruning (only for expectimax)
-        self.UPPER_BOUND = 2
+        self.UPPER_BOUND = 300
         self.max_heur = -float('inf')
 
     def getMove(self, grid):
@@ -312,7 +312,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 4)
         score += grid.getCellValue((3, 3)) * (4 ** 3)
 
-        return score
+        return score / (8192 * (4 ** 6))
 
     def mergeHeuristic(self,grid):
         """ Heuristics that rewards for the same values next to each other """
@@ -325,7 +325,13 @@ class PlayerAI(BaseAI):
                 neighborDown = grid.getCellValue((i + 1,j))
                 neighborRight = grid.getCellValue((i,j - 1))
 
-                if curr == neighborUp or curr == neighborLeft or curr == neighborDown or curr == neighborRight:
+                if curr == neighborUp:
+                    score += curr * (4 ** 8)
+                if curr == neighborLeft:
+                    score += curr * (4 ** 8)
+                if curr == neighborDown:
+                    score += curr * (4 ** 8)
+                if curr == neighborRight:
                     score += curr * (4 ** 8)
 
         return score / (64 * 2048 * (4 ** 8))

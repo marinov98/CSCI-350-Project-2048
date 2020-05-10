@@ -23,7 +23,7 @@ actionDic = {
 (PLAYER_TURN, COMPUTER_TURN) = (0, 1)
 
 # Time Limit Before Losing
-timeLimit = 2
+timeLimit = 3.95
 allowance = 0.05
 maxTime   = timeLimit + allowance
 
