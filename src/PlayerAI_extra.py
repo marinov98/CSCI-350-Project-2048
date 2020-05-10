@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [5,2,1,4,0.1], memo_dic = {}):
+    def __init__(self, weights = [5,0,1,4,0.1], memo_dic = {}):
         #store previously computed states to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -137,7 +137,7 @@ class PlayerAI(BaseAI):
                     self.memo[(tuple(tuple(row) for row in grid.map), i, playerTurn)] = (beta, 0)
             return (beta,0)
 
-    #expectimax with alpha-beta pruning
+    # expectimax with alpha-beta pruning
     def expectimax(self, grid, movesLeft, playerTurn, alpha, beta, probOfReaching=1):
         #self.totalCalls += 1
         #check if this state has been computed to at least the required depth
@@ -147,7 +147,7 @@ class PlayerAI(BaseAI):
                 return self.memo[(tuple(tuple(row) for row in grid.map), i, playerTurn)]
         if playerTurn:
             #player moveset
-            moveset = grid.getAvailableMoves([0,2,1,3])
+            moveset = grid.getAvailableMoves([1,2,3,0])
         else:
             #computer moveset consists of placing 2 or 4 into an empty cell
             moveset = [(i,j) for i in [2,4] for j in grid.getAvailableCells()]
