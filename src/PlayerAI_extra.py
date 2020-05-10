@@ -137,7 +137,7 @@ class PlayerAI(BaseAI):
                     self.memo[(tuple(tuple(row) for row in grid.map), i, playerTurn)] = (beta, 0)
             return (beta,0)
 
-    #expectimax with alpha-beta pruning
+    # expectimax with alpha-beta pruning
     def expectimax(self, grid, movesLeft, playerTurn, alpha, beta, probOfReaching=1):
         #self.totalCalls += 1
         #check if this state has been computed to at least the required depth
