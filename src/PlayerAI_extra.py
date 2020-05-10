@@ -147,7 +147,7 @@ class PlayerAI(BaseAI):
                 return self.memo[(tuple(tuple(row) for row in grid.map), i, playerTurn)]
         if playerTurn:
             #player moveset
-            moveset = grid.getAvailableMoves([0,2,1,3])
+            moveset = grid.getAvailableMoves([1,2,3,0])
         else:
             #computer moveset consists of placing 2 or 4 into an empty cell
             moveset = [(i,j) for i in [2,4] for j in grid.getAvailableCells()]
