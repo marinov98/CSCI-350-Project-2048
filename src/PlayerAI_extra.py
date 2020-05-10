@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [5,2,1,4,0.1], memo_dic = {}):
+    def __init__(self, weights = [5,0,1,4,0.1], memo_dic = {}):
         #store previously computed states to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
