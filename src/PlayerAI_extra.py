@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [10,0,7,0.2,0.05], memo_dic = {}):
+    def __init__(self, weights = [1,0,0,0,0], memo_dic = {}):
         #store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -288,8 +288,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 13)
         score += grid.getCellValue((3, 3)) * (4 ** 12)
 
-        maxTile = grid.getMaxTile()
-        return (score / (8192 * (4 ** 15)))
+        return (score / (32768 * (4 ** 15)))
 
     def monotonicPatternHeuristic(self,grid):
         """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
@@ -336,7 +335,7 @@ class PlayerAI(BaseAI):
                 if curr == neighborRight:
                     score += curr
 
-        return (score / (48 * grid.getMaxTile()))
+        return (score / (48 * 1024))
 
     def openHeuristic(self,grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
@@ -366,7 +365,7 @@ class PlayerAI(BaseAI):
                     penalty -= abs(grid.getCellValue((i,j)) - neighborRight)
 
         # this will be assigned a negative because we are penalizing
-        return (penalty / (48 * 16382))
+        return (penalty / (48 * 122))
 
     def monotonicHeuristic(self, grid):
         """ Ensure tiles align monotonically """
