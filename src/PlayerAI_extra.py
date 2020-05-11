@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [5,2,1,4,0.1], memo_dic = {}):
+    def __init__(self, weights = [0,0,0,0,1], memo_dic = {}):
         #store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -288,7 +288,8 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 13)
         score += grid.getCellValue((3, 3)) * (4 ** 12)
 
-        return score / (8192 * (4 ** 15))
+        maxTile = grid.getMaxTile()
+        return ((score - 2) / ((16384 * (4 ** 15)) - 2))
 
     def monotonicPatternHeuristic(self,grid):
         """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
@@ -312,7 +313,8 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 4)
         score += grid.getCellValue((3, 3)) * (4 ** 3)
 
-        return score / (8192 * (4 ** 6))
+        maxTile = grid.getMaxTile()
+        return (score - 2 / ((16834 * (4 ** 6)) - 2))
 
     def mergeHeuristic(self,grid):
         """ Heuristics that rewards for the same values next to each other """
@@ -326,19 +328,19 @@ class PlayerAI(BaseAI):
                 neighborRight = grid.getCellValue((i,j - 1))
 
                 if curr == neighborUp:
-                    score += curr * (4 ** 8)
+                    score += curr
                 if curr == neighborLeft:
-                    score += curr * (4 ** 8)
+                    score += curr
                 if curr == neighborDown:
-                    score += curr * (4 ** 8)
+                    score += curr
                 if curr == neighborRight:
-                    score += curr * (4 ** 8)
+                    score += curr
 
-        return score / (64 * 2048 * (4 ** 8))
+        return (score / (48 * grid.getMaxTile()))
 
     def openHeuristic(self,grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
-        return len(grid.getAvailableCells()) / 16
+        return len(grid.getAvailableCells()) / (16 * 5)
 
 
     def clusterHeuristic(self,grid):
@@ -363,8 +365,10 @@ class PlayerAI(BaseAI):
                 if neighborRight != None:
                     penalty -= abs(grid.getCellValue((i,j)) - neighborRight)
 
+        maxTile = grid.getMaxTile()
+        currmaxTile = 4 if maxTile < 4 else maxTile
         # this will be assigned a negative because we are penalizing
-        return penalty / (self.sum_of_tiles(grid) * 64000)
+        return (penalty / (48 * (16384 - 2)))
 
     def monotonicHeuristic(self, grid):
         """ Ensure tiles align monotonically """
@@ -385,6 +389,6 @@ class PlayerAI(BaseAI):
                 multiplier *= 2
             else:
                 multiplier = 0
-
-        return score / (4096 * 4 + 2048 * 8 + 1024 * 16 + 512 * 32)
+        maxTile = grid.getMaxTile()
+        return score / (4 * (16834 * 4))
 
