@@ -251,7 +251,7 @@ class PlayerAI(BaseAI):
 
 
     def heuristic(self, grid):
-        vals = [self.monotonicPatternHeuristic(grid), self.monotonicHeuristic(grid), self.clusterHeuristic(grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
+        vals = [self.snakePatternHeuristic(grid), self.monotonicHeuristic(grid), self.clusterHeuristic(grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
         #print(vals, sum(vals))
         x = sum(vals[i]*self.weights[i] for i in range(len(vals)))
         '''
