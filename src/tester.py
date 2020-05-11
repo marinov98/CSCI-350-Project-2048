@@ -173,8 +173,9 @@ def main():
         maxTile     = gameManager.start()
         maxHeur = -1 * float("inf")
         maxHeur = max(maxHeur, playerAI.max_heur)
-        print(maxTile)
-        print(maxHeur)
+        print("Max tile:", maxTile)
+        print("Max Heuristic value:", maxHeur)
+        print("Weights used:", playerAI.weights)
     elif sys.argv[1] == 'd':
         playerAI    = PlayerAI()
         computerAI  = ComputerAI()
@@ -183,8 +184,9 @@ def main():
         maxHeur = -1 * float("inf")
         maxTile = gameManager.start()
         maxHeur = max(maxHeur, playerAI.max_heur)
-        print(maxTile)
-        print(maxHeur)
+        print("Max tile:", maxTile)
+        print("Max Heuristic value:", maxHeur)
+        print("Weights used:", playerAI.weights)
     elif sys.argv[1] == 't':
         tot = 0
         trials = int(sys.argv[2]) if len(sys.argv) > 2 else 10
@@ -208,6 +210,7 @@ def main():
         print("number of 2048s: ", scores.count(2048))
         print("number of 4096s: ", scores.count(4096))
         print("number of 8192s: ", scores.count(8192))
+        print("Weights used:", playerAI.weights)
     elif sys.argv[1] == 's':
         num_vals_for_weights = 6
         trial_weights_temp = list(range(pow(num_vals_for_weights, 3)))

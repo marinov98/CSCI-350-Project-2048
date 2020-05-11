@@ -12,8 +12,8 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [5,0,1,4,0.1], memo_dic = {}):
-        #store previously computed states to reduce redundant computation
+    def __init__(self, weights = [5,2,1,4,0.1], memo_dic = {}):
+        #store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
         #self.MemoCalls = 0
@@ -21,9 +21,9 @@ class PlayerAI(BaseAI):
         #weights for the heuristic
         self.weights = list(weights)
         #time limit to make sure we don't use too much time
-        self.time_limit = 0.2
+        self.time_limit = 1
         #upper bound on heuristic function for alpha-beta pruning (only for expectimax)
-        self.UPPER_BOUND = 300
+        self.UPPER_BOUND = 999
         self.max_heur = -float('inf')
 
     def getMove(self, grid):
@@ -251,7 +251,7 @@ class PlayerAI(BaseAI):
 
 
     def heuristic(self, grid):
-        vals = [self.snakePatternHeuristic(grid), self.monotonicHeuristic(grid), self.clusterHeuristic(grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
+        vals = [self.monotonicPatternHeuristic(grid), self.monotonicHeuristic(grid), self.clusterHeuristic(grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
         #print(vals, sum(vals))
         x = sum(vals[i]*self.weights[i] for i in range(len(vals)))
         '''
