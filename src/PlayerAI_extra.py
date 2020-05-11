@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [0,0,0,0,1], memo_dic = {}):
+    def __init__(self, weights = [10,0,7,0.2,0.05], memo_dic = {}):
         #store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -289,7 +289,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 3)) * (4 ** 12)
 
         maxTile = grid.getMaxTile()
-        return ((score - 2) / ((16384 * (4 ** 15)) - 2))
+        return (score / (8192 * (4 ** 15)))
 
     def monotonicPatternHeuristic(self,grid):
         """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
@@ -314,7 +314,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 3)) * (4 ** 3)
 
         maxTile = grid.getMaxTile()
-        return (score - 2 / ((16834 * (4 ** 6)) - 2))
+        return (score / ((8192 * (4 ** 6))))
 
     def mergeHeuristic(self,grid):
         """ Heuristics that rewards for the same values next to each other """
@@ -340,7 +340,7 @@ class PlayerAI(BaseAI):
 
     def openHeuristic(self,grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
-        return len(grid.getAvailableCells()) / (16 * 5)
+        return len(grid.getAvailableCells()) / 16
 
 
     def clusterHeuristic(self,grid):
@@ -365,10 +365,8 @@ class PlayerAI(BaseAI):
                 if neighborRight != None:
                     penalty -= abs(grid.getCellValue((i,j)) - neighborRight)
 
-        maxTile = grid.getMaxTile()
-        currmaxTile = 4 if maxTile < 4 else maxTile
         # this will be assigned a negative because we are penalizing
-        return (penalty / (48 * (16384 - 2)))
+        return (penalty / (48 * 16382))
 
     def monotonicHeuristic(self, grid):
         """ Ensure tiles align monotonically """
