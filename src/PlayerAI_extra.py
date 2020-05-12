@@ -36,7 +36,7 @@ class PlayerAI(BaseAI):
             print("ratio: ", self.MemoCalls/self.totalCalls if self.totalCalls!=0 else "totalCalls=0")
         '''
         self.timer = time.process_time()
-        return self.iterative_deepening_expectimax(grid,1,4)
+        return self.iterative_deepening_expectimax(grid,1,5)
       # return (Marinov.expectiAlphaBeta(Marinov,grid))[1]
         #return self.iterative_deepening_minimax(grid,1,4)
         #return self.minimax(grid, 3, True, -float('inf'), float('inf'))[1]
@@ -288,7 +288,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 13)
         score += grid.getCellValue((3, 3)) * (4 ** 12)
 
-        return (score / (16834 * (4 ** 15)))
+        return (score / (16384 * (4 ** 15)))
 
     def monotonicPatternHeuristic(self,grid):
         """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
@@ -313,7 +313,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 3)) * (4 ** 3)
 
         maxTile = grid.getMaxTile()
-        return (score / ((8192 * (4 ** 6))))
+        return (score / ((16384 * (4 ** 6))))
 
     def mergeHeuristic(self,grid):
         """ Heuristics that rewards for the same values next to each other """
@@ -335,7 +335,7 @@ class PlayerAI(BaseAI):
                 if curr == neighborRight:
                     score += curr
 
-        return (score / (48 * 128))
+        return (score / (48 * 256))
 
     def openHeuristic(self,grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
