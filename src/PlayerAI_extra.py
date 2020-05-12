@@ -288,7 +288,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 13)
         score += grid.getCellValue((3, 3)) * (4 ** 12)
 
-        return (score / (32768 * (4 ** 15)))
+        return (score / (16834 * (4 ** 15)))
 
     def monotonicPatternHeuristic(self,grid):
         """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
@@ -335,7 +335,7 @@ class PlayerAI(BaseAI):
                 if curr == neighborRight:
                     score += curr
 
-        return (score / (48 * 1024))
+        return (score / (48 * 128))
 
     def openHeuristic(self,grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
@@ -365,7 +365,7 @@ class PlayerAI(BaseAI):
                     penalty -= abs(grid.getCellValue((i,j)) - neighborRight)
 
         # this will be assigned a negative because we are penalizing
-        return (penalty / (48 * 122))
+        return (penalty / (48 * 254))
 
     def monotonicHeuristic(self, grid):
         """ Ensure tiles align monotonically """
