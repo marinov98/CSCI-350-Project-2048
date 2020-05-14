@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [1,0,0,0,0], memo_dic = {}):
+    def __init__(self, weights = [1,0,1,1,0.1], memo_dic = {}):
         #store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -36,7 +36,7 @@ class PlayerAI(BaseAI):
             print("ratio: ", self.MemoCalls/self.totalCalls if self.totalCalls!=0 else "totalCalls=0")
         '''
         self.timer = time.process_time()
-        return self.iterative_deepening_expectimax(grid,1,5)
+        return self.iterative_deepening_expectimax(grid,1,4)
       # return (Marinov.expectiAlphaBeta(Marinov,grid))[1]
         #return self.iterative_deepening_minimax(grid,1,4)
         #return self.minimax(grid, 3, True, -float('inf'), float('inf'))[1]
