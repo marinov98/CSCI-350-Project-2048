@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [1,0,1,1,0.1], memo_dic = {}):
+    def __init__(self, weights = [5,0,1,1,0.1], memo_dic = {}):
         #store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -23,7 +23,7 @@ class PlayerAI(BaseAI):
         #time limit to make sure we don't use too much time
         self.time_limit = 1
         #upper bound on heuristic function for alpha-beta pruning (only for expectimax)
-        self.UPPER_BOUND = 999
+        self.UPPER_BOUND = 9999
         self.max_heur = -float('inf')
 
     def getMove(self, grid):
