@@ -37,7 +37,7 @@ class PlayerAI(BaseAI):
             print("ratio: ", self.MemoCalls/self.totalCalls if self.totalCalls!=0 else "totalCalls=0")
         '''
         self.timer = time.process_time()
-        return self.iterative_deepening_expectimax(grid,1,2)
+        return self.iterative_deepening_expectimax(grid,1,4)
       # return (Marinov.expectiAlphaBeta(Marinov,grid))[1]
         #return self.iterative_deepening_minimax(grid,1,4)
         #return self.minimax(grid, 3, True, -float('inf'), float('inf'))[1]
