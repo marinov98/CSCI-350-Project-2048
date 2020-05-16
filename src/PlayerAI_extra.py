@@ -16,6 +16,7 @@ class PlayerAI(BaseAI):
         #store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
+        self.high_score = 0
         #self.MemoCalls = 0
         #self.totalCalls = 0
         #weights for the heuristic
@@ -36,7 +37,7 @@ class PlayerAI(BaseAI):
             print("ratio: ", self.MemoCalls/self.totalCalls if self.totalCalls!=0 else "totalCalls=0")
         '''
         self.timer = time.process_time()
-        return self.iterative_deepening_expectimax(grid,1,4)
+        return self.iterative_deepening_expectimax(grid,1,2)
       # return (Marinov.expectiAlphaBeta(Marinov,grid))[1]
         #return self.iterative_deepening_minimax(grid,1,4)
         #return self.minimax(grid, 3, True, -float('inf'), float('inf'))[1]
@@ -153,11 +154,13 @@ class PlayerAI(BaseAI):
             moveset = [(i,j) for i in [2,4] for j in grid.getAvailableCells()]
         #if not enough time left, cut off recursion
         if (time.process_time()-self.timer > self.time_limit):
+            self.high_score += grid.score
             self.timed_out = True
             movesLeft = 0
         #if no more moves or at max depth or probability of reaching this node < 1/10000, cut off recursion
         #print(probOfReaching)
         if movesLeft == 0 or len(moveset) == 0 or probOfReaching < 0.0005:
+            self.high_score += grid.score
             return (self.heuristic(grid), 0)
         #player turn
         if playerTurn:

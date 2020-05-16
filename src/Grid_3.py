@@ -6,6 +6,7 @@ vecIndex = [UP, DOWN, LEFT, RIGHT] = range(4)
 class Grid:
     def __init__(self, size: int=4):
         self.size = size
+        self.score = 0
         self.map  = [[0] * self.size for i in range(self.size)]
 
     def clone(self):
@@ -119,6 +120,7 @@ class Grid:
         while i < len(cells) - 1:
             if cells[i] == cells[i+1]:
                 cells[i] *= 2
+                self.score += cells[i]
 
                 del cells[i+1]
 

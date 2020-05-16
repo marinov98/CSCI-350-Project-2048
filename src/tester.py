@@ -175,6 +175,7 @@ def main():
         maxHeur = max(maxHeur, playerAI.max_heur)
         print("Max tile:", maxTile)
         print("Max Heuristic value:", maxHeur)
+        print("Game Score:", playerAI.high_score)
         print("Weights used:", playerAI.weights)
     elif sys.argv[1] == 'd':
         playerAI    = PlayerAI()
@@ -192,6 +193,7 @@ def main():
         trials = int(sys.argv[2]) if len(sys.argv) > 2 else 10
         scores = []
         max_heur = -float('inf')
+        max_high_score = 0
         for _ in range(trials):
             playerAI    = PlayerAI()
             computerAI  = ComputerAI()
@@ -200,12 +202,15 @@ def main():
             maxTile     = gameManager.start_no_disp()
             memo_dict = playerAI.memo
             scores.append(maxTile)
+            print("Game Score:", playerAI.high_score)
             print(maxTile)
             tot += math.log(maxTile, 2)
             max_heur = max(max_heur, playerAI.max_heur)
+            max_high_score = max(playerAI.high_score,max_high_score)
         print(tot/trials)
         print(sorted(scores, reverse=True)[0:5])
         print("Max value of heuristic: ", max_heur)
+        print("Highest score achieved: ", max_high_score)
         print("number of 1024s: ", scores.count(1024))
         print("number of 2048s: ", scores.count(2048))
         print("number of 4096s: ", scores.count(4096))
