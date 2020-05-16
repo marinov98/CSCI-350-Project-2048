@@ -12,18 +12,19 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights = [5,0,1,4,0.1], memo_dic = {}):
-        #store previously computed states to reduce redundant computation
+    def __init__(self, weights = [5,0,1,1,0.1], memo_dic = {}):
+        #store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
+        self.high_score = 0
         #self.MemoCalls = 0
         #self.totalCalls = 0
         #weights for the heuristic
         self.weights = list(weights)
         #time limit to make sure we don't use too much time
-        self.time_limit = 0.2
+        self.time_limit = 1
         #upper bound on heuristic function for alpha-beta pruning (only for expectimax)
-        self.UPPER_BOUND = 300
+        self.UPPER_BOUND = 9999
         self.max_heur = -float('inf')
 
     def getMove(self, grid):
@@ -36,7 +37,7 @@ class PlayerAI(BaseAI):
             print("ratio: ", self.MemoCalls/self.totalCalls if self.totalCalls!=0 else "totalCalls=0")
         '''
         self.timer = time.process_time()
-        return self.iterative_deepening_expectimax(grid,1,4)
+        return self.iterative_deepening_expectimax(grid,1,2)
       # return (Marinov.expectiAlphaBeta(Marinov,grid))[1]
         #return self.iterative_deepening_minimax(grid,1,4)
         #return self.minimax(grid, 3, True, -float('inf'), float('inf'))[1]
@@ -153,11 +154,13 @@ class PlayerAI(BaseAI):
             moveset = [(i,j) for i in [2,4] for j in grid.getAvailableCells()]
         #if not enough time left, cut off recursion
         if (time.process_time()-self.timer > self.time_limit):
+            self.high_score += grid.score
             self.timed_out = True
             movesLeft = 0
         #if no more moves or at max depth or probability of reaching this node < 1/10000, cut off recursion
         #print(probOfReaching)
         if movesLeft == 0 or len(moveset) == 0 or probOfReaching < 0.0005:
+            self.high_score += grid.score
             return (self.heuristic(grid), 0)
         #player turn
         if playerTurn:
@@ -288,7 +291,7 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 13)
         score += grid.getCellValue((3, 3)) * (4 ** 12)
 
-        return score / (8192 * (4 ** 15))
+        return (score / (16384 * (4 ** 15)))
 
     def monotonicPatternHeuristic(self,grid):
         """ Heuristic that tries to ensure that the tiles follow a  monotonic pattern """
@@ -312,7 +315,8 @@ class PlayerAI(BaseAI):
         score += grid.getCellValue((3, 2)) * (4 ** 4)
         score += grid.getCellValue((3, 3)) * (4 ** 3)
 
-        return score / (8192 * (4 ** 6))
+        maxTile = grid.getMaxTile()
+        return (score / ((16384 * (4 ** 6))))
 
     def mergeHeuristic(self,grid):
         """ Heuristics that rewards for the same values next to each other """
@@ -326,15 +330,15 @@ class PlayerAI(BaseAI):
                 neighborRight = grid.getCellValue((i,j - 1))
 
                 if curr == neighborUp:
-                    score += curr * (4 ** 8)
+                    score += curr
                 if curr == neighborLeft:
-                    score += curr * (4 ** 8)
+                    score += curr
                 if curr == neighborDown:
-                    score += curr * (4 ** 8)
+                    score += curr
                 if curr == neighborRight:
-                    score += curr * (4 ** 8)
+                    score += curr
 
-        return score / (64 * 2048 * (4 ** 8))
+        return (score / (48 * 256))
 
     def openHeuristic(self,grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
@@ -364,7 +368,7 @@ class PlayerAI(BaseAI):
                     penalty -= abs(grid.getCellValue((i,j)) - neighborRight)
 
         # this will be assigned a negative because we are penalizing
-        return penalty / (self.sum_of_tiles(grid) * 64000)
+        return (penalty / (48 * 254))
 
     def monotonicHeuristic(self, grid):
         """ Ensure tiles align monotonically """
@@ -385,6 +389,6 @@ class PlayerAI(BaseAI):
                 multiplier *= 2
             else:
                 multiplier = 0
-
-        return score / (4096 * 4 + 2048 * 8 + 1024 * 16 + 512 * 32)
+        maxTile = grid.getMaxTile()
+        return score / (4 * (16834 * 4))
 
