@@ -173,9 +173,8 @@ def main():
         maxTile     = gameManager.start()
         maxHeur = -1 * float("inf")
         maxHeur = max(maxHeur, playerAI.max_heur)
-        print("Max tile:", maxTile)
+        print("Max Tile: {}  Score: {}".format(maxTile, playerAI.high_score))
         print("Max Heuristic value:", maxHeur)
-        print("Game Score:", playerAI.high_score)
         print("Weights used:", playerAI.weights)
     elif sys.argv[1] == 'd':
         playerAI    = PlayerAI()
@@ -202,8 +201,7 @@ def main():
             maxTile     = gameManager.start_no_disp()
             memo_dict = playerAI.memo
             scores.append(maxTile)
-            print("Game Score:", playerAI.high_score)
-            print(maxTile)
+            print("Max Tile: {}  Score: {}".format(maxTile, playerAI.high_score))
             tot += math.log(maxTile, 2)
             max_heur = max(max_heur, playerAI.max_heur)
             max_high_score = max(playerAI.high_score,max_high_score)
