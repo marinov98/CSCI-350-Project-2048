@@ -1,7 +1,6 @@
 '''
-Aryan Bhatt
-CSCI 350
-HW 2 (Programming)
+Final AI Project
+Authors: Owen Okunhardt, Aryan Bhatt, Marin Marinov
 '''
 
 import random
@@ -29,14 +28,8 @@ class PlayerAI(BaseAI):
 
     def getMove(self, grid):
         # initialize time
-        '''
-        if (len(self.memo)%35 == 0):
-            print(len(self.memo))
-            print("totalCalls: ", self.totalCalls)
-            print("MemoCalls: ", self.MemoCalls)
-            print("ratio: ", self.MemoCalls/self.totalCalls if self.totalCalls!=0 else "totalCalls=0")
-        '''
         self.timer = time.process_time()
+
         return self.iterative_deepening_expectimax(grid, 1, 2)
 
 #######################################
@@ -233,6 +226,7 @@ class PlayerAI(BaseAI):
 #######################################
 # Heuristics
 #######################################
+
 # Aryan
     # number of empty cells
     def h1(self, grid):
@@ -271,7 +265,8 @@ class PlayerAI(BaseAI):
         return (ans / self.sum_of_tiles(grid)) / 4000
 
     def heuristic(self, grid):
-        vals = [self.snakePatternHeuristic(grid), self.clusterHeuristic(grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
+        vals = [self.snakePatternHeuristic(grid), self.clusterHeuristic(
+            grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
         #print(vals, sum(vals))
         x = sum(vals[i]*self.weights[i] for i in range(len(vals)))
         '''
@@ -360,6 +355,7 @@ class PlayerAI(BaseAI):
     def openHeuristic(self, grid):
         """ Heuristic that grants bonuses for the number of available tiles"""
         return len(grid.getAvailableCells()) / 16
+
     def clusterHeuristic(self, grid):
         """ Heuristic that penalizes tiles that have a big difference with their neightbors """
 

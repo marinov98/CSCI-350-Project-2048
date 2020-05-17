@@ -1,3 +1,8 @@
+'''
+Final AI Project
+Authors: Owen Okunhardt, Aryan Bhatt, Marin Marinov
+'''
+
 import numpy as np
 
 
