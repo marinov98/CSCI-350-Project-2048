@@ -32,12 +32,13 @@ def visualize_covariance_matrix(cov_matrix):
 
 def generate_next_generation_data(data, means, population=False, best_samples=10):
     """ Greates new data for next generation and their means """
-    data = [0]
-    means = [0]
+    new_gen_data = [] # perhaps some kind of preprocessing
+
+    new_gen_data_mean = [np.mean(heur_weight) for heur_weight in new_gen_data]
     # grab best samples and recalculate means
     # needs more work
 
-    return data, means
+    return new_gen_data, new_gen_data
 
 
 def generate_normal_distribution(data, means, cov_matrix=None, population=False, samples=10):
