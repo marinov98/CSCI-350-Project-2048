@@ -38,7 +38,7 @@ def generate_next_generation_data(data, means, population=False, best_samples=10
     # grab best samples and recalculate means
     # needs more work
 
-    return new_gen_data, new_gen_data
+    return new_gen_data, new_gen_data_mean
 
 
 def generate_normal_distribution(data, means, cov_matrix=None, population=False, samples=10):
