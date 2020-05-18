@@ -30,18 +30,42 @@ def visualize_covariance_matrix(cov_matrix):
     plt.show()
 
 
-def generate_next_generation_data(data, means, population=False, best_samples=10):
+def get_multivariate_std(data, mean, var1, var2, best_samples):
+    """ computes standard deviaton for two variables """
+
+
+def generate_covariance_matrix4(data, means):
+    """ Creates a 4x4 covariance matrix based on the data """
+    cov_matrix = [[0 for i in range(4)] for j in range(4)]
+
+    return cov_matrix
+
+
+def generate_next_generation_data(map, means, population=False, best_samples=10):
     """ Greates new data for next generation and their means """
-    new_gen_data = [] # perhaps some kind of preprocessing
+    sorted_data = sorted(map.keys())
+    new_gen_data = []
 
-    new_gen_data_mean = [np.mean(heur_weight) for heur_weight in new_gen_data]
-    # grab best samples and recalculate means
-    # needs more work
+    # get all weight combinations into an array
+    for val in sorted_data.values():
+        new_gen_data.append(val)
 
-    return new_gen_data, new_gen_data_mean
+    # get only the best
+    new_gen_data_best = new_gen_data[-1 * best_samples:]
+
+    # Create transposed version for easier means and covariance computation
+    new_gen_data_transposed = (np.array(new_gen_data_best)).transpose()
+
+    new_gen_data_means = [np.mean(heur_weight)
+                          for heur_weight in new_gen_data_transposed]
+
+    # recreate covariance matrix with old mean
+    new_gen_cov = generate_covariance_matrix4(new_gen_data_transposed, means)
+
+    return new_gen_cov, new_gen_data_means
 
 
-def generate_normal_distribution(data, means, cov_matrix=None, population=False, samples=10):
+def generate_normal_distribution(data=[], means=[], cov_matrix=None, population=False, samples=10):
     """ Finds covariance matrix and returns multivarial normal distribution """
     covariance_matrix = np.cov(
         data, bias=population) if not cov_matrix else cov_matrix

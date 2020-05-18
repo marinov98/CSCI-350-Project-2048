@@ -2,11 +2,12 @@ from Grid_3 import Grid
 from ComputerAI_3 import ComputerAI
 from PlayerAI_extra import PlayerAI
 from Displayer_3 import Displayer
-
 import CMAES
+
 import time
 import random
 import math
+import numpy as np
 import multiprocessing
 import sys
 
@@ -275,18 +276,60 @@ def main():
         file.close()
     # CMA-ES
     elif sys.argv[1] == 'c':
+
+        generations = 20
+        runs = 10
+        samples = 50
+
+        # Generate a random set of weight combinations and their mean
+        weight_combinations, means = CMAES.generate_data(
+            0.1, 500, samples=samples)
+        combinations = np.array(weight_combinations)
+
+        print("CMA-ES")
+        print("Generations:", generations)
+        print("Runs per generation", runs)
+        print("Samples:", samples)
+
+        # transpose so that each row is a weight combination
+        combinations = combinations.transpose()
+
         # perform CMA-ES
+        for generation in range(generations):
+            # hash map of avg score which maps to weight combinations
+            tracker = {}
+            # Use weight combinations(for loop iterating for weight combinations)
+            for combination in combinations:
+                avg = 0
+                weights = [heur_weight for heur_weight in combination]
+                maxTiles = []
+                print("Current weights:", weights)
+                for run in range(runs):
+                    # initialization
+                    playerAI = PlayerAI(weights=weights)
+                    computerAI = ComputerAI()
+                    displayer = Displayer()
+                    gameManager = GameManager(
+                        4, playerAI, computerAI, displayer)
+                    maxTile = gameManager.start_no_disp()
+                    memo_dict = playerAI.memo
 
-        # 1. Generate a random set of weight combinations
-        weight_combinations = CMAES.generate_data(0.1, 500, samples=50)
+                    # track run results
+                    maxTiles.append(maxTile)
+                    avg += PlayerAI.high_score
+                avg /= runs
+                tracker[avg] = weights
+                print("Average score:", avg)
+                print("Moving to next weight combination...")
+            # 3. take 25 % best average and generate gaussian distributiom
+            cov_matrix, new_means = CMAES.generate_next_generation_data(
+                tracker, means)
+            new_data = CMAES.generate_normal_distribution(
+                means=new_means, cov_matrix=cov_matrix)
+            # 4. take 100 new samples and repeat the process
+            print("Current generation finished, moving to next one...")
+        print("CMA-ES finished")
 
-        # 2. Use weight combinations(for loop iterating for weight combinations)
-        avg = 0
-        # hash map of avg score which maps weight combinations?
-
-        # 3. take 25 % best average and generate gaussian distributiom
-
-        # 4. take 100 new samples and repeat the process
     else:
         playerAI = PlayerAI()
         computerAI = ComputerAI()
