@@ -30,13 +30,52 @@ def visualize_covariance_matrix(cov_matrix):
     plt.show()
 
 
-def get_multivariate_std(data, mean, var1, var2, best_samples):
-    """ computes standard deviaton for two variables """
+def get_multivariate_std(data1, mean1, data2=[], mean2=0, same=False):
+    """ computes standard deviaton for one or more variables """
+    summation = 0
+    # for diagonals
+    if same:
+        for sample in data1:
+            summation += ((sample - mean1) * (sample - mean1))
+    else:
+        for (var1, var2) in zip(data1, data2):
+            summation += ((var1 - mean1) * (var2 - mean2))
+
+    summation /= len(data1)
+    return summation
 
 
 def generate_covariance_matrix4(data, means):
     """ Creates a 4x4 covariance matrix based on the data """
     cov_matrix = [[0 for i in range(4)] for j in range(4)]
+
+    # assumes each row in the data is a variable
+    x = data[0]
+    y = data[1]
+    z = data[2]
+    w = data[3]
+
+    x_mean = means[0]
+    y_mean = means[1]
+    z_mean = means[2]
+    w_mean = means[3]
+
+    cov_matrix[0][0] = get_multivariate_std(x, x_mean, same=True)
+    cov_matrix[0][1] = get_multivariate_std(x, x_mean, y, y_mean)
+    cov_matrix[0][2] = get_multivariate_std(x, x_mean, z, z_mean)
+    cov_matrix[0][3] = get_multivariate_std(x, x_mean, w, w_mean)
+    cov_matrix[1][0] = cov_matrix[0][1]
+    cov_matrix[1][1] = get_multivariate_std(y, y_mean, same=True)
+    cov_matrix[1][2] = get_multivariate_std(y, y_mean, z, z_mean)
+    cov_matrix[1][3] = get_multivariate_std(y, y_mean, w, w_mean)
+    cov_matrix[2][0] = cov_matrix[0][2]
+    cov_matrix[2][1] = cov_matrix[1][2]
+    cov_matrix[2][2] = get_multivariate_std(z, z_mean, same=True)
+    cov_matrix[2][3] = get_multivariate_std(z, z_mean, w, w_mean)
+    cov_matrix[3][0] = cov_matrix[0][3]
+    cov_matrix[3][1] = cov_matrix[1][3]
+    cov_matrix[3][2] = cov_matrix[2][3]
+    cov_matrix[3][3] = get_multivariate_std(w, w_mean, same=True)
 
     return cov_matrix
 
@@ -69,4 +108,15 @@ def generate_normal_distribution(data=[], means=[], cov_matrix=None, population=
     """ Finds covariance matrix and returns multivarial normal distribution """
     covariance_matrix = np.cov(
         data, bias=population) if not cov_matrix else cov_matrix
-    return np.random.Generator.multivariate_normal(covariance_matrix, means, size=samples)
+    return np.random.default_rng().multivariate_normal(means, covariance_matrix, size=samples)
+
+
+A = [45, 37, 42, 35, 39]
+B = [38, 31, 26, 28, 33]
+C = [10, 15, 17, 21, 12]
+
+data = np.array([A, B, C])
+meanz = [np.mean(var) for var in data]
+covMatrix = np.cov(data, bias=True)
+print(np.random.default_rng().multivariate_normal(
+    meanz, covMatrix, size=10))
