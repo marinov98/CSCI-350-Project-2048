@@ -1,23 +1,25 @@
-from Grid_3       import Grid
+from Grid_3 import Grid
 from ComputerAI_3 import ComputerAI
 from PlayerAI_extra import PlayerAI
-from Displayer_3  import Displayer
+from Displayer_3 import Displayer
+import CMAES
 
 import time
 import random
 import math
+import numpy as np
 import multiprocessing
 import sys
 
 defaultInitialTiles = 2
-defaultProbability  = 0.9
+defaultProbability = 0.9
 
 actionDic = {
     0: "UP",
     1: "DOWN",
     2: "LEFT",
     3: "RIGHT",
-    None: "NONE" # For error logging
+    None: "NONE"  # For error logging
 }
 
 (PLAYER_TURN, COMPUTER_TURN) = (0, 1)
@@ -25,20 +27,21 @@ actionDic = {
 # Time Limit Before Losing
 timeLimit = 3.95
 allowance = 0.05
-maxTime   = timeLimit + allowance
+maxTime = timeLimit + allowance
+
 
 class GameManager:
     def __init__(self, size=4, playerAI=None, computerAI=None, displayer=None):
         self.grid = Grid(size)
         self.possibleNewTiles = [2, 4]
         self.probability = defaultProbability
-        self.initTiles   = defaultInitialTiles
-        self.over        = False
+        self.initTiles = defaultInitialTiles
+        self.over = False
 
         # Initialize the AI players
         self.computerAI = computerAI or ComputerAI()
-        self.playerAI   = playerAI   or PlayerAI()
-        self.displayer  = displayer  or Displayer()
+        self.playerAI = playerAI or PlayerAI()
+        self.displayer = displayer or Displayer()
 
     def updateAlarm(self) -> None:
         """ Checks if move exceeded the time limit and updates the alarm """
@@ -52,12 +55,12 @@ class GameManager:
         """ Returns 2 with probability 0.95 and 4 with 0.05 """
         return self.possibleNewTiles[random.random() > self.probability]
 
-    def insertRandomTiles(self, numTiles:int):
+    def insertRandomTiles(self, numTiles: int):
         """ Insert numTiles number of random tiles. For initialization """
         for i in range(numTiles):
             tileValue = self.getNewTileValue()
-            cells     = self.grid.getAvailableCells()
-            cell      = random.choice(cells) if cells else None
+            cells = self.grid.getAvailableCells()
+            cell = random.choice(cells) if cells else None
             self.grid.setCellValue(cell, tileValue)
 
     def start(self) -> int:
@@ -66,13 +69,13 @@ class GameManager:
         # Initialize the game
         self.insertRandomTiles(self.initTiles)
         self.displayer.display(self.grid)
-        turn          = PLAYER_TURN # Player AI Goes First
+        turn = PLAYER_TURN  # Player AI Goes First
         self.prevTime = time.process_time()
 
         while self.grid.canMove() and not self.over:
             # Copy to Ensure AI Cannot Change the Real Grid to Cheat
             gridCopy = self.grid.clone()
-            #time.sleep(.1)
+            # time.sleep(.1)
             move = None
 
             if turn == PLAYER_TURN:
@@ -117,20 +120,20 @@ class GameManager:
 
         # Initialize the game
         self.insertRandomTiles(self.initTiles)
-        #self.displayer.display(self.grid)
-        turn          = PLAYER_TURN # Player AI Goes First
+        # self.displayer.display(self.grid)
+        turn = PLAYER_TURN  # Player AI Goes First
         self.prevTime = time.process_time()
 
         while self.grid.canMove() and not self.over:
             # Copy to Ensure AI Cannot Change the Real Grid to Cheat
             gridCopy = self.grid.clone()
-            #time.sleep(.1)
+            # time.sleep(.1)
             move = None
 
             if turn == PLAYER_TURN:
                 #print("Player's Turn: ", end="")
                 move = self.playerAI.getMove(gridCopy)
-                #print(actionDic[move])
+                # print(actionDic[move])
 
                 # If move is valid, attempt to move the grid
                 if move != None and 0 <= move < 4:
@@ -156,7 +159,7 @@ class GameManager:
 
             # Comment out during heuristing optimizations to increase runtimes.
             # Printing slows down computation time.
-            #self.displayer.display(self.grid)
+            # self.displayer.display(self.grid)
 
             # Exceeding the Time Allotted for Any Turn Terminates the Game
             self.updateAlarm()
@@ -164,22 +167,23 @@ class GameManager:
 
         return self.grid.getMaxTile()
 
+
 def main():
     if len(sys.argv) < 2:
-        playerAI    = PlayerAI()
-        computerAI  = ComputerAI()
-        displayer   = Displayer()
+        playerAI = PlayerAI()
+        computerAI = ComputerAI()
+        displayer = Displayer()
         gameManager = GameManager(4, playerAI, computerAI, displayer)
-        maxTile     = gameManager.start()
+        maxTile = gameManager.start()
         maxHeur = -1 * float("inf")
         maxHeur = max(maxHeur, playerAI.max_heur)
         print("Max Tile: {}  Score: {}".format(maxTile, playerAI.high_score))
         print("Max Heuristic value:", maxHeur)
         print("Weights used:", playerAI.weights)
     elif sys.argv[1] == 'd':
-        playerAI    = PlayerAI()
-        computerAI  = ComputerAI()
-        displayer   = Displayer()
+        playerAI = PlayerAI()
+        computerAI = ComputerAI()
+        displayer = Displayer()
         gameManager = GameManager(4, playerAI, computerAI, displayer)
         maxHeur = -1 * float("inf")
         maxTile = gameManager.start()
@@ -194,17 +198,18 @@ def main():
         max_heur = -float('inf')
         max_high_score = 0
         for _ in range(trials):
-            playerAI    = PlayerAI()
-            computerAI  = ComputerAI()
-            displayer   = Displayer()
+            playerAI = PlayerAI()
+            computerAI = ComputerAI()
+            displayer = Displayer()
             gameManager = GameManager(4, playerAI, computerAI, displayer)
-            maxTile     = gameManager.start_no_disp()
+            maxTile = gameManager.start_no_disp()
             memo_dict = playerAI.memo
             scores.append(maxTile)
-            print("Max Tile: {}  Score: {}".format(maxTile, playerAI.high_score))
+            print("Max Tile: {}  Score: {}".format(
+                maxTile, playerAI.high_score))
             tot += math.log(maxTile, 2)
             max_heur = max(max_heur, playerAI.max_heur)
-            max_high_score = max(playerAI.high_score,max_high_score)
+            max_high_score = max(playerAI.high_score, max_high_score)
         print(tot/trials)
         print(sorted(scores, reverse=True)[0:5])
         print("Max value of heuristic: ", max_heur)
@@ -225,7 +230,7 @@ def main():
             for j in range(3):
                 weights[j] = i % num_vals_for_weights
                 i = i // num_vals_for_weights
-            for n in range(2,num_vals_for_weights):
+            for n in range(2, num_vals_for_weights):
                 for j in range(3):
                     if weights[j] % n != 0:
                         break
@@ -239,8 +244,9 @@ def main():
         filename = 'output_' + str(run_num)+'_of_'+str(runs) + '.txt'
         file = open(filename, 'w')
         file.write('RUN ' + str(run_num) + ' OF ' + str(runs) + '\n')
-        file.write('TRIALS ' + str(num_trials*(run_num-1)//runs) + ' TO ' + str(num_trials*run_num//runs) + ' OF ' + str(num_trials) + '\n\n')
-        for i in trial_weights[num_trials*(run_num-1)//runs : num_trials*run_num//runs]:
+        file.write('TRIALS ' + str(num_trials*(run_num-1)//runs) + ' TO ' +
+                   str(num_trials*run_num//runs) + ' OF ' + str(num_trials) + '\n\n')
+        for i in trial_weights[num_trials*(run_num-1)//runs: num_trials*run_num//runs]:
             out_str = ''
             weights_as_int = i
             out_str += str(weights_as_int) + ','
@@ -253,12 +259,12 @@ def main():
             trials = 20
             scores = []
             for _ in range(trials):
-                playerAI    = PlayerAI(weights)
-                computerAI  = ComputerAI()
-                displayer   = Displayer()
+                playerAI = PlayerAI(weights)
+                computerAI = ComputerAI()
+                displayer = Displayer()
                 gameManager = GameManager(4, playerAI, computerAI, displayer)
-                maxTile     = gameManager.start_no_disp()
-                scores.append(math.log(maxTile,2))
+                maxTile = gameManager.start_no_disp()
+                scores.append(math.log(maxTile, 2))
                 out_str += str(maxTile) + ','
             scores = sorted(scores, reverse=True)[0:trials//2]
             for score in scores:
@@ -268,15 +274,71 @@ def main():
             file.write(out_str)
             #print("weights: ", weights, " score: ", real_score)
         file.close()
+    # CMA-ES
+    elif sys.argv[1] == 'c':
+
+        generations = 20
+        runs = 10
+        samples = 50
+
+        # Generate a random set of weight combinations and their mean
+        weight_combinations, means = CMAES.generate_data(
+            0.1, 500, samples=samples)
+        combinations = np.array(weight_combinations)
+
+        print("CMA-ES")
+        print("Generations:", generations)
+        print("Runs per generation", runs)
+        print("Samples:", samples)
+
+        # transpose so that each row is a weight combination
+        combinations = combinations.transpose()
+
+        # perform CMA-ES
+        for generation in range(generations):
+            # hash map of avg score which maps to weight combinations
+            tracker = {}
+            # Use weight combinations(for loop iterating for weight combinations)
+            for combination in combinations:
+                avg = 0
+                weights = [heur_weight for heur_weight in combination]
+                maxTiles = []
+                print("Current weights:", weights)
+                for run in range(runs):
+                    # initialization
+                    playerAI = PlayerAI(weights=weights)
+                    computerAI = ComputerAI()
+                    displayer = Displayer()
+                    gameManager = GameManager(
+                        4, playerAI, computerAI, displayer)
+                    maxTile = gameManager.start_no_disp()
+                    memo_dict = playerAI.memo
+
+                    # track run results
+                    maxTiles.append(maxTile)
+                    avg += PlayerAI.high_score
+                avg /= runs
+                tracker[avg] = weights
+                print("Average score:", avg)
+                print("Moving to next weight combination...")
+            # 3. take 25 % best average and generate gaussian distributiom
+            cov_matrix, new_means = CMAES.generate_next_generation_data(
+                tracker, means)
+            new_data = CMAES.generate_normal_distribution(
+                means=new_means, cov_matrix=cov_matrix)
+            # 4. take 100 new samples and repeat the process
+            print("Current generation finished, moving to next one...")
+        print("CMA-ES finished")
+
     else:
-        playerAI    = PlayerAI()
-        computerAI  = ComputerAI()
-        displayer   = Displayer()
+        playerAI = PlayerAI()
+        computerAI = ComputerAI()
+        displayer = Displayer()
         gameManager = GameManager(4, playerAI, computerAI, displayer)
-        maxTile     = gameManager.start()
+        maxTile = gameManager.start()
         print(maxTile)
-    #'''
-    #'''
+    # '''
+    # '''
     '''
     goodOnes = []
     rlygoodones = []
@@ -315,7 +377,7 @@ def main():
     print("at least 10: ", rlygoodones)
     print("at least 9.8: ", goodOnes)
     #'''
-    #'''
+    # '''
 
 
 if __name__ == '__main__':
