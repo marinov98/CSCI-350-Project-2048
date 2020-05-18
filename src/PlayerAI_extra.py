@@ -23,7 +23,7 @@ class PlayerAI(BaseAI):
         self.time_limit = 1
 
         # upper bound on heuristic function for alpha-beta pruning (only for expectimax)
-        self.UPPER_BOUND = 9999999
+        self.UPPER_BOUND = 999999999
         self.max_heur = -float('inf')
 
     def getMove(self, grid):

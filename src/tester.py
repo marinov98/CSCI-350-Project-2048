@@ -278,7 +278,7 @@ def main():
     elif sys.argv[1] == 'c':
 
         generations = 20
-        runs = 10
+        runs = 5
         samples = 50
 
         # Generate a random set of weight combinations and their mean
@@ -316,19 +316,23 @@ def main():
 
                     # track run results
                     maxTiles.append(maxTile)
-                    avg += PlayerAI.high_score
+                    avg += playerAI.high_score
                 avg /= runs
                 tracker[avg] = weights
                 print("Average score:", avg)
                 print("Moving to next weight combination...")
-            # 3. take 25 % best average and generate gaussian distributiom
+            # 3. take 25 % best average and generate gaussian distribution
+            best = round(0.25 * samples)
             cov_matrix, new_means = CMAES.generate_next_generation_data(
-                tracker, means)
+                tracker, means, best_samples=best)
             new_data = CMAES.generate_normal_distribution(
-                means=new_means, cov_matrix=cov_matrix)
-            # 4. take 100 new samples and repeat the process
+                means=new_means, cov_matrix=cov_matrix, samples=samples)
+            # 4. take N new samples and repeat the process
+            means = new_means
+            combinations = new_data
             print("Current generation finished, moving to next one...")
         print("CMA-ES finished")
+        print("Final Generation:", combinations)
 
     else:
         playerAI = PlayerAI()
