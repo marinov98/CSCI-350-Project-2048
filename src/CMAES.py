@@ -82,11 +82,10 @@ def generate_covariance_matrix4(data, means):
 
 def generate_next_generation_data(map, means, population=False, best_samples=10):
     """ Greates new data for next generation and their means """
-    sorted_data = sorted(map.keys())
     new_gen_data = []
 
     # get all weight combinations into an array
-    for val in sorted_data.values():
+    for key, val in sorted(map.items()):
         new_gen_data.append(val)
 
     # get only the best
@@ -109,14 +108,3 @@ def generate_normal_distribution(data=[], means=[], cov_matrix=None, population=
     covariance_matrix = np.cov(
         data, bias=population) if not cov_matrix else cov_matrix
     return np.random.default_rng().multivariate_normal(means, covariance_matrix, size=samples)
-
-
-A = [45, 37, 42, 35, 39]
-B = [38, 31, 26, 28, 33]
-C = [10, 15, 17, 21, 12]
-
-data = np.array([A, B, C])
-meanz = [np.mean(var) for var in data]
-covMatrix = np.cov(data, bias=True)
-print(np.random.default_rng().multivariate_normal(
-    meanz, covMatrix, size=10))
