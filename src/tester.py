@@ -277,7 +277,7 @@ def main():
     # CMA-ES
     elif sys.argv[1] == 'c':
 
-        generations = 3
+        generations = 5
         runs = 5
         samples = 10
 
@@ -392,6 +392,7 @@ def main():
                 break
 
         print("Final Generation:\n {} ".format(combinations))
+        CMAES.visualize_covariance_matrix(cov_matrix)
         print("\nCMA-ES finished")
 
     else:

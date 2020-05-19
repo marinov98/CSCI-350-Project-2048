@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights=[297.161, 415.786, 489.587, 32.86], memo_dic={}):
+    def __init__(self, weights=[305, 188, 645, 25.8], memo_dic={}):
         # store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -265,7 +265,7 @@ class PlayerAI(BaseAI):
         return (ans / self.sum_of_tiles(grid)) / 4000
 
     def heuristic(self, grid):
-        vals = [self.snakePatternHeuristic(grid), self.clusterHeuristic(
+        vals = [self.monotonicHeuristic(grid), self.h4(
             grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
         #print(vals, sum(vals))
         x = sum(vals[i]*self.weights[i] for i in range(len(vals)))

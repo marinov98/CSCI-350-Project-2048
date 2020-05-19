@@ -17,7 +17,7 @@ def generate_data(start, end, variables=4, samples=100):
     """ Creates a variables x samples matrix of random numbers based on range """
     weight_combinations = [None] * variables
     for variable in range(variables):
-        weight_combinations[variable] = np.random.uniform(start, end, samples)
+        weight_combinations[variable] = np.random.randint(start, end, samples)
 
     means = find_means_of_weights(weight_combinations)
 
