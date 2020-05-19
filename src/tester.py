@@ -353,7 +353,7 @@ def main():
             print("\nGeneration {} of {} finished".format(
                 generation + 1, generations))
             print("Current Best Results")
-            print("Max tile: {}\n High Score: {}".format(
+            print("Max tile: {}\nHigh Score: {}".format(
                 max_tile, best_score))
             print("Best Weight Combination:", best_weights)
             print("Generation:", good_gen + 1)
