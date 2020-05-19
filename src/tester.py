@@ -277,9 +277,9 @@ def main():
     # CMA-ES
     elif sys.argv[1] == 'c':
 
-        generations = 20
+        generations = 1
         runs = 5
-        samples = 50
+        samples = 10
 
         # Generate a random set of weight combinations and their mean
         weight_combinations, means = CMAES.generate_data(
@@ -293,6 +293,11 @@ def main():
 
         # transpose so that each row is a weight combination
         combinations = combinations.transpose()
+        best_comb = []
+        max_tile = 0
+        best_score = 0
+        best_weights = []
+        good_gen = -1
 
         # perform CMA-ES
         for generation in range(generations):
@@ -302,7 +307,6 @@ def main():
             for combination in combinations:
                 avg = 0
                 weights = [heur_weight for heur_weight in combination]
-                maxTiles = []
                 print("Current weights:", weights)
                 for run in range(runs):
                     # initialization
@@ -315,24 +319,45 @@ def main():
                     memo_dict = playerAI.memo
 
                     # track run results
-                    maxTiles.append(maxTile)
-                    avg += playerAI.high_score
+                    curr_high_score = playerAI.high_score
+                    avg += curr_high_score
+
+                    # keep track of highest performance
+                    if best_score < curr_high_score:
+                        best_score = curr_high_score
+                        max_tile = maxTile
+                        best_weights = weights
+                        good_gen = generation
+
                 avg /= runs
                 tracker[avg] = weights
                 print("Average score:", avg)
                 print("Moving to next weight combination...")
+
             # 3. take 25 % best average and generate gaussian distribution
             best = round(0.25 * samples)
             cov_matrix, new_means = CMAES.generate_next_generation_data(
                 tracker, means, best_samples=best)
+
+            # 4. take N new samples and repeat the process
             new_data = CMAES.generate_normal_distribution(
                 means=new_means, cov_matrix=cov_matrix, samples=samples)
-            # 4. take N new samples and repeat the process
+
+            # put new parameters in place
             means = new_means
             combinations = new_data
-            print("Current generation finished, moving to next one...")
+
+            # print results from generation
+            print("Generation {} of {} finished".format(
+                generation + 1, generations))
+            print("Current Best Results")
+            print("Max tile of {} with a score of {}".format(
+                max_tile, best_score))
+            print("Best weight combination:", best_weights)
+            print("Generation from which results were achieved:", good_gen + 1)
+
         print("CMA-ES finished")
-        print("Final Generation:", combinations)
+        print("Final Generation:\n {} ".format(combinations))
 
     else:
         playerAI = PlayerAI()
