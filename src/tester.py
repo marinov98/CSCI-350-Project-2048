@@ -277,9 +277,9 @@ def main():
     # CMA-ES
     elif sys.argv[1] == 'c':
 
-        generations = 20
-        runs = 10
-        samples = 20
+        generations = 3
+        runs = 5
+        samples = 10
 
         # Generate a random set of weight combinations and their mean
         weight_combinations, means = CMAES.generate_data(
@@ -294,16 +294,20 @@ def main():
         # transpose so that each row is a weight combination
         combinations = combinations.transpose()
         best_comb = []
+        best_avg_comb = []
+        best_avg_score = 0
         max_tile = 0
         best_score = 0
         best_weights = []
         good_gen = -1
+        good_avg_gen = -1
 
         # perform CMA-ES
         for generation in range(generations):
             # hash map of avg score which maps to weight combinations
             tracker = {}
             comb = 1  # track which combination we are on
+            gen_avg_score = 0
             # Use weight combinations(for loop iterating for weight combinations)
             for combination in combinations:
                 avg = 0
@@ -330,11 +334,23 @@ def main():
                         good_gen = generation
 
                 avg /= runs
+
+                # best average tracking
+                if avg > best_avg_score:
+                    best_avg_score = avg
+                    best_avg_comb = combination
+                    good_avg_gen = generation
+
+                # generation average score tracking
+                gen_avg_score += avg
+
                 tracker[avg] = weights
                 print("Combination {} of {}".format(comb, samples))
                 print("Weights:", weights)
                 print("Average Score: {}\n".format(avg))
                 comb += 1
+
+            gen_avg_score /= samples
 
             # 3. take 25 % best average and generate gaussian distribution
             best = round(0.25 * samples)
@@ -352,16 +368,25 @@ def main():
             # print results from generation
             print("\nGeneration {} of {} finished".format(
                 generation + 1, generations))
+            print("Generation average:", gen_avg_score)
+            check = cov_matrix[0][0] + cov_matrix[1][1] + \
+                cov_matrix[2][2] + cov_matrix[3][3]
+            print("Current variance among weights: {} \n".format(check))
+
+            # current best
             print("Current Best Results")
             print("Max tile: {}\nHigh Score: {}".format(
                 max_tile, best_score))
             print("Best Weight Combination:", best_weights)
             print("Generation:", good_gen + 1)
 
+            # current best average
+            print("\nCurrent Best Average Results")
+            print("Best average score", best_avg_score)
+            print("Best Average Weight Combination:", best_avg_comb)
+            print("Generation: {}\n".format(good_avg_gen + 1))
+
             # check for convergence
-            check = cov_matrix[0][0] + cov_matrix[1][1] + \
-                cov_matrix[2][2] + cov_matrix[3][3]
-            print("Current variance among weights: {} \n".format(check))
             if check < 5:
                 print("Weights have converged")
                 break
