@@ -30,7 +30,7 @@ class PlayerAI(BaseAI):
         # initialize time
         self.timer = time.process_time()
 
-        return self.iterative_deepening_expectimax(grid, 1, 4)
+        return self.iterative_deepening_expectimax(grid, 1, 2)
 
 #######################################
 # Algorithms
