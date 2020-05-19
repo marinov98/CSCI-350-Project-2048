@@ -277,9 +277,9 @@ def main():
     # CMA-ES
     elif sys.argv[1] == 'c':
 
-        generations = 10
+        generations = 20
         runs = 10
-        samples = 50
+        samples = 20
 
         # Generate a random set of weight combinations and their mean
         weight_combinations, means = CMAES.generate_data(
@@ -303,11 +303,11 @@ def main():
         for generation in range(generations):
             # hash map of avg score which maps to weight combinations
             tracker = {}
+            comb = 1  # track which combination we are on
             # Use weight combinations(for loop iterating for weight combinations)
             for combination in combinations:
                 avg = 0
                 weights = [heur_weight for heur_weight in combination]
-                print("Current weights:", weights)
                 for run in range(runs):
                     # initialization
                     playerAI = PlayerAI(weights=weights)
@@ -331,8 +331,10 @@ def main():
 
                 avg /= runs
                 tracker[avg] = weights
-                print("Average score:", avg)
-                print("Moving to next weight combination...")
+                print("Combination {} of {}".format(comb, samples))
+                print("Weights:", weights)
+                print("Average Score: {}\n".format(avg))
+                comb += 1
 
             # 3. take 25 % best average and generate gaussian distribution
             best = round(0.25 * samples)
