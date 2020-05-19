@@ -277,7 +277,7 @@ def main():
     # CMA-ES
     elif sys.argv[1] == 'c':
 
-        generations = 1
+        generations = 2
         runs = 5
         samples = 10
 
@@ -288,8 +288,8 @@ def main():
 
         print("CMA-ES")
         print("Generations:", generations)
-        print("Runs per generation", runs)
-        print("Samples:", samples)
+        print("Runs per generation:", runs)
+        print("Samples: {} \n".format(samples))
 
         # transpose so that each row is a weight combination
         combinations = combinations.transpose()
@@ -348,16 +348,24 @@ def main():
             combinations = new_data
 
             # print results from generation
-            print("Generation {} of {} finished".format(
+            print("\nGeneration {} of {} finished".format(
                 generation + 1, generations))
             print("Current Best Results")
-            print("Max tile of {} with a score of {}".format(
+            print("Max tile: {}\n High Score: {}".format(
                 max_tile, best_score))
-            print("Best weight combination:", best_weights)
-            print("Generation from which results were achieved:", good_gen + 1)
+            print("Best Weight Combination:", best_weights)
+            print("Generation:", good_gen + 1)
 
-        print("CMA-ES finished")
+            # check for convergence
+            check = cov_matrix[0][0] + cov_matrix[1][1] + \
+                cov_matrix[2][2] + cov_matrix[3][3]
+            print("Current variance among weights: {} \n".format(check))
+            if check < 5:
+                print("Weights have converged")
+                break
+
         print("Final Generation:\n {} ".format(combinations))
+        print("\nCMA-ES finished")
 
     else:
         playerAI = PlayerAI()
