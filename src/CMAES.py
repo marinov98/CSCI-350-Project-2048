@@ -17,7 +17,7 @@ def generate_data(start, end, variables=4, samples=100):
     """ Creates a variables x samples matrix of random numbers based on range """
     weight_combinations = [None] * variables
     for variable in range(variables):
-        weight_combinations[variable] = np.random.uniform(start, end, samples)
+        weight_combinations[variable] = np.random.randint(start, end, samples)
 
     means = find_means_of_weights(weight_combinations)
 
@@ -94,8 +94,7 @@ def generate_next_generation_data(map, means, population=False, best_samples=10)
     # Create transposed version for easier means and covariance computation
     new_gen_data_transposed = (np.array(new_gen_data_best)).transpose()
 
-    new_gen_data_means = [np.mean(heur_weight)
-                          for heur_weight in new_gen_data_transposed]
+    new_gen_data_means = find_means_of_weights(new_gen_data_transposed)
 
     # recreate covariance matrix with old mean
     new_gen_cov = generate_covariance_matrix4(new_gen_data_transposed, means)
