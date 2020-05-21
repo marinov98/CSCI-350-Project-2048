@@ -1,20 +1,20 @@
-from Grid_3       import Grid
+from Grid_3 import Grid
 from ComputerAI_3 import ComputerAI
-from PlayerAI_3   import PlayerAI
-from Displayer_3  import Displayer
+from ref import PlayerAI
+from Displayer_3 import Displayer
 
 import time
 import random
 
 defaultInitialTiles = 2
-defaultProbability  = 0.9
+defaultProbability = 0.9
 
 actionDic = {
     0: "UP",
     1: "DOWN",
     2: "LEFT",
     3: "RIGHT",
-    None: "NONE" # For error logging
+    None: "NONE"  # For error logging
 }
 
 (PLAYER_TURN, COMPUTER_TURN) = (0, 1)
@@ -22,38 +22,39 @@ actionDic = {
 # Time Limit Before Losing
 timeLimit = 0.5
 allowance = 0.05
-maxTime   = timeLimit + allowance
+maxTime = timeLimit + allowance
+
 
 class GameManager:
     def __init__(self, size=4, playerAI=None, computerAI=None, displayer=None):
         self.grid = Grid(size)
         self.possibleNewTiles = [2, 4]
         self.probability = defaultProbability
-        self.initTiles   = defaultInitialTiles
-        self.over        = False
+        self.initTiles = defaultInitialTiles
+        self.over = False
 
         # Initialize the AI players
         self.computerAI = computerAI or ComputerAI()
-        self.playerAI   = playerAI   or PlayerAI()
-        self.displayer  = displayer  or Displayer()
+        self.playerAI = playerAI or PlayerAI()
+        self.displayer = displayer or Displayer()
 
     def updateAlarm(self) -> None:
         """ Checks if move exceeded the time limit and updates the alarm """
         if time.process_time() - self.prevTime > maxTime:
             self.over = True
-        
+
         self.prevTime = time.process_time()
 
     def getNewTileValue(self) -> int:
         """ Returns 2 with probability 0.95 and 4 with 0.05 """
         return self.possibleNewTiles[random.random() > self.probability]
 
-    def insertRandomTiles(self, numTiles:int):
+    def insertRandomTiles(self, numTiles: int):
         """ Insert numTiles number of random tiles. For initialization """
         for i in range(numTiles):
             tileValue = self.getNewTileValue()
-            cells     = self.grid.getAvailableCells()
-            cell      = random.choice(cells) if cells else None
+            cells = self.grid.getAvailableCells()
+            cell = random.choice(cells) if cells else None
             self.grid.setCellValue(cell, tileValue)
 
     def start(self) -> int:
@@ -63,7 +64,7 @@ class GameManager:
         maxHeuristic = 0
         self.insertRandomTiles(self.initTiles)
         self.displayer.display(self.grid)
-        turn          = PLAYER_TURN # Player AI Goes First
+        turn = PLAYER_TURN  # Player AI Goes First
         self.prevTime = time.process_time()
 
         while self.grid.canMove() and not self.over:
@@ -110,15 +111,17 @@ class GameManager:
 
         return self.grid.getMaxTile(), maxHeuristic
 
+
 def main():
-    playerAI    = PlayerAI()
-    computerAI  = ComputerAI()
-    displayer   = Displayer()
+    playerAI = PlayerAI()
+    computerAI = ComputerAI()
+    displayer = Displayer()
     gameManager = GameManager(4, playerAI, computerAI, displayer)
 
     maxTile, maxHeuristic = gameManager.start()
     print(maxTile)
-    print("Maximum heuristic: {}".format(maxHeuristic))
+    print("Maximum Heuristic: {}".format(maxHeuristic))
+
 
 if __name__ == '__main__':
     main()

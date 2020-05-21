@@ -94,8 +94,7 @@ def generate_next_generation_data(map, means, population=False, best_samples=10)
     # Create transposed version for easier means and covariance computation
     new_gen_data_transposed = (np.array(new_gen_data_best)).transpose()
 
-    new_gen_data_means = [np.mean(heur_weight)
-                          for heur_weight in new_gen_data_transposed]
+    new_gen_data_means = find_means_of_weights(new_gen_data_transposed)
 
     # recreate covariance matrix with old mean
     new_gen_cov = generate_covariance_matrix4(new_gen_data_transposed, means)

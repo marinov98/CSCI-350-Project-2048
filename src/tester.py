@@ -277,13 +277,13 @@ def main():
     # CMA-ES
     elif sys.argv[1] == 'c':
 
-        generations = 5
-        runs = 5
-        samples = 10
+        generations = 50
+        runs = 10
+        samples = 50
 
         # Generate a random set of weight combinations and their mean
         weight_combinations, means = CMAES.generate_data(
-            0.1, 500, samples=samples)
+            0, 2000, samples=samples)
         combinations = np.array(weight_combinations)
 
         print("CMA-ES")
