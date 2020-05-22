@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights=[1626.294, 1558.325, 922.186, 585.527], memo_dic={}):
+    def __init__(self, weights=[1289.279, 989.061, 1222.072, 195.018], memo_dic={}):
         # store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -20,7 +20,7 @@ class PlayerAI(BaseAI):
         self.weights = list(weights)
 
         # time limit to make sure we don't use too much time
-        self.time_limit = 1
+        self.time_limit = 0.25
 
         # upper bound on heuristic function for alpha-beta pruning (only for expectimax)
         self.UPPER_BOUND = float('inf')
@@ -30,7 +30,7 @@ class PlayerAI(BaseAI):
         # initialize time
         self.timer = time.process_time()
 
-        return self.iterative_deepening_expectimax(grid, 1, 4)
+        return self.iterative_deepening_expectimax(grid, 1, 9)
 
 #######################################
 # Algorithms
@@ -158,7 +158,7 @@ class PlayerAI(BaseAI):
             movesLeft = 0
         # if no more moves or at max depth or probability of reaching this node < 1/10000, cut off recursion
         # print(probOfReaching)
-        if movesLeft == 0 or len(moveset) == 0 or probOfReaching < 0.0005:
+        if movesLeft == 0 or len(moveset) == 0 or probOfReaching < 0.05:
             self.high_score += grid.score
             return (self.heuristic(grid), 0)
         # player turn
