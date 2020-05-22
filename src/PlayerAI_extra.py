@@ -12,7 +12,7 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights=[-59.728, 1387.056, 26.826, 1989.1886], memo_dic={}):
+    def __init__(self, weights=[1626.294, 1558.325, 922.186, 585.527], memo_dic={}):
         # store previously computed stats to reduce redundant computation
         self.memo = memo_dic
         self.timed_out = False
@@ -266,7 +266,7 @@ class PlayerAI(BaseAI):
 
     def heuristic(self, grid):
         vals = [self.snakePatternHeuristic(grid), self.clusterHeuristic(
-            grid), self.openHeuristic(grid), self.mergeHeuristic(grid)]
+            grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
         #print(vals, sum(vals))
         x = sum(vals[i]*self.weights[i] for i in range(len(vals)))
         '''

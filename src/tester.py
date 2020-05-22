@@ -277,9 +277,9 @@ def main():
     # CMA-ES
     elif sys.argv[1] == 'c':
 
-        generations = 50
-        runs = 10
-        samples = 50
+        generations = 40
+        runs = 5
+        samples = 10
 
         # Generate a random set of weight combinations and their mean
         weight_combinations, means = CMAES.generate_data(
