@@ -1,4 +1,5 @@
 # CSCI-350-Project-2048
+![2048](https://github.com/marinov98/CSCI-350-Project-2048/blob/CMA-ES/img/8192-best.PNG)
 
 ## AI Final Project
 - Aryan Bhatt
