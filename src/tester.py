@@ -180,6 +180,8 @@ def main():
         print("Max Tile: {}  Score: {}".format(maxTile, playerAI.high_score))
         print("Max Heuristic value:", maxHeur)
         print("Weights used:", playerAI.weights)
+        print("Max depth:", playerAI.max_depth)
+        print("Lowest probability of reaching:", playerAI.prob)
     elif sys.argv[1] == 'd':
         playerAI = PlayerAI()
         computerAI = ComputerAI()
@@ -222,7 +224,6 @@ def main():
     elif sys.argv[1] == 's':
         num_vals_for_weights = 6
         trial_weights_temp = list(range(pow(num_vals_for_weights, 3)))
-        # trial_weights_temp = [73,103,121,122,133,140,151,163,169,177,187,191,193,201,212]
         trial_weights = []
         for i in trial_weights_temp:
             weights = [0]*4
@@ -272,14 +273,13 @@ def main():
             avg_score = sum(scores) * 2 / trials
             out_str += str(avg_score) + '\n'
             file.write(out_str)
-            #print("weights: ", weights, " score: ", real_score)
         file.close()
     # CMA-ES
     elif sys.argv[1] == 'c':
 
-        generations = 50
-        runs = 10
-        samples = 50
+        generations = 40
+        runs = 5
+        samples = 20
 
         # Generate a random set of weight combinations and their mean
         weight_combinations, means = CMAES.generate_data(

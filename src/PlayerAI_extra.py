@@ -12,15 +12,17 @@ from PlayerAI_3 import PlayerAI as Marinov
 
 class PlayerAI(BaseAI):
 
-    def __init__(self, weights=[-59.728, 1387.056, 26.826, 1989.1886], memo_dic={}):
+    def __init__(self, weights=[1289.279, 989.061, 1222.072, 195.018], memo_dic={}):
         # store previously computed stats to reduce redundant computation
         self.memo = memo_dic
+        self.max_depth = 0
         self.timed_out = False
         self.high_score = 0
+        self.prob = 100
         self.weights = list(weights)
 
         # time limit to make sure we don't use too much time
-        self.time_limit = 1
+        self.time_limit = 0.25
 
         # upper bound on heuristic function for alpha-beta pruning (only for expectimax)
         self.UPPER_BOUND = float('inf')
@@ -30,27 +32,11 @@ class PlayerAI(BaseAI):
         # initialize time
         self.timer = time.process_time()
 
-        return self.iterative_deepening_expectimax(grid, 1, 4)
+        return self.iterative_deepening_expectimax(grid, 1, 9)
 
 #######################################
 # Algorithms
 #######################################
-
-    # iterative deepening search with minimax
-    def iterative_deepening_minimax(self, grid, start, end):
-        # base case, in case all runs time out
-        answer = random.choice([0, 2])
-        # iterative deepening
-        for i in range(start, end):
-            self.timed_out = False
-            # call minimax with depth cut off at i
-            new_answer = self.minimax(
-                grid, i, True, -float('inf'), float('inf'))[1]
-            if not self.timed_out:
-                answer = new_answer
-            else:
-                break
-        return answer
 
     # iterative deepening search with expectimax
     def iterative_deepening_expectimax(self, grid, start, end):
@@ -64,86 +50,20 @@ class PlayerAI(BaseAI):
                 grid, i, True, -float('inf'), float('inf'))[1]
             if not self.timed_out:
                 answer = new_answer
+                self.max_depth = max(self.max_depth, i)
             else:
+                self.max_depth = max(self.max_depth, i)
                 break
         return answer
 
-    # minimax with alpha-beta pruning
-    def minimax(self, grid, movesLeft, playerTurn, alpha, beta):
-        # check if this state has been computed to at least the required depth
-        for i in range(movesLeft, 10):
-            if (tuple(tuple(row) for row in grid.map), i, playerTurn) in self.memo:
-                return self.memo[(tuple(tuple(row) for row in grid.map), i, playerTurn)]
 
-        if playerTurn:
-            # player moveset
-            moveset = grid.getAvailableMoves([0, 2, 1, 3])
-        else:
-            # computer moveset consists of placing 2 or 4 into an empty cell
-            moveset = [(i, j) for i in [2, 4]
-                       for j in grid.getAvailableCells()]
-        # if not enough time left, cut off recursion
-        if (time.process_time()-self.timer > self.time_limit):
-            self.timed_out = True
-            movesLeft = 0
-        # if no more moves or at max depth, cut off recursion
-        if movesLeft == 0 or len(moveset) == 0:
-            return (self.heuristic(grid), 0)
-
-        # player turn
-        if playerTurn:
-            # default move is UP (0)
-            maxMove = 0
-            for move in moveset:
-                # recursive call to evaluate child node
-                newVal = self.minimax(
-                    move[1], movesLeft-1, False, alpha, beta)[0]
-                # update max child value
-                if newVal > alpha:
-                    alpha = newVal
-                    maxMove = move[0]
-                # alpha-beta pruning
-                if alpha >= beta:
-                    break
-            # store computed result
-            self.memo[(tuple(tuple(row) for row in grid.map),
-                       movesLeft, playerTurn)] = (alpha, maxMove)
-            for i in range(movesLeft):
-                if (tuple(tuple(row) for row in grid.map), i, playerTurn) in self.memo:
-                    self.memo[(tuple(tuple(row) for row in grid.map),
-                               i, playerTurn)] = (alpha, maxMove)
-            return (alpha, maxMove)
-        # computer turn
-        else:
-            for move in moveset:
-                # place tile into cell to create child state
-                newGrid = grid.clone()
-                newGrid.setCellValue(move[1], move[0])
-                # evaluate child node
-                nodeValue = self.minimax(
-                    newGrid, movesLeft-1, True, alpha, beta)[0]
-                # update min child value
-                beta = min(beta, nodeValue)
-                # alpha-beta pruning
-                if alpha >= beta:
-                    break
-            # store computed result
-            self.memo[(tuple(tuple(row) for row in grid.map),
-                       movesLeft, playerTurn)] = (beta, 0)
-            for i in range(movesLeft):
-                if (tuple(tuple(row) for row in grid.map), i, playerTurn) in self.memo:
-                    self.memo[(tuple(tuple(row)
-                                     for row in grid.map), i, playerTurn)] = (beta, 0)
-            return (beta, 0)
-
-    # expectimax with alpha-beta pruning
     def expectimax(self, grid, movesLeft, playerTurn, alpha, beta, probOfReaching=1):
-        #self.totalCalls += 1
+        """ Expectimax with alpha beta pruning """
         # check if this state has been computed to at least the required depth
         for i in range(movesLeft, 10):
             if (tuple(tuple(row) for row in grid.map), i, playerTurn) in self.memo:
-                #self.MemoCalls += 1
                 return self.memo[(tuple(tuple(row) for row in grid.map), i, playerTurn)]
+
         if playerTurn:
             # player moveset
             moveset = grid.getAvailableMoves([1, 2, 3, 0])
@@ -151,16 +71,19 @@ class PlayerAI(BaseAI):
             # computer moveset consists of placing 2 or 4 into an empty cell
             moveset = [(i, j) for i in [2, 4]
                        for j in grid.getAvailableCells()]
+
         # if not enough time left, cut off recursion
         if (time.process_time()-self.timer > self.time_limit):
             self.high_score += grid.score
             self.timed_out = True
             movesLeft = 0
-        # if no more moves or at max depth or probability of reaching this node < 1/10000, cut off recursion
-        # print(probOfReaching)
-        if movesLeft == 0 or len(moveset) == 0 or probOfReaching < 0.0005:
+
+        # if no more moves or at max depth or probability of reaching this node < threshold, cut off recursion
+        if movesLeft == 0 or len(moveset) == 0 or probOfReaching < 0.05:
+            self.prob = min(self.prob, probOfReaching)
             self.high_score += grid.score
             return (self.heuristic(grid), 0)
+
         # player turn
         if playerTurn:
             # default move is UP (0)
@@ -266,7 +189,7 @@ class PlayerAI(BaseAI):
 
     def heuristic(self, grid):
         vals = [self.snakePatternHeuristic(grid), self.clusterHeuristic(
-            grid), self.openHeuristic(grid), self.mergeHeuristic(grid)]
+            grid), self.mergeHeuristic(grid), self.openHeuristic(grid)]
         #print(vals, sum(vals))
         x = sum(vals[i]*self.weights[i] for i in range(len(vals)))
         '''
@@ -329,6 +252,29 @@ class PlayerAI(BaseAI):
 
         maxTile = grid.getMaxTile()
         return (score / ((16384 * (4 ** 6))))
+
+    def mergeHeuristicAlt(self, grid):
+        """ Heuristics that rewards for the same values next to each other """
+        score = 0
+        for i in range(4):
+            for j in range(4):
+                curr = grid.getCellValue((i, j))
+                neighborUp = grid.getCellValue((i - 1, j))
+                neighborLeft = grid.getCellValue((i, j + 1))
+                neighborDown = grid.getCellValue((i + 1, j))
+                neighborRight = grid.getCellValue((i, j - 1))
+
+                if curr != 0:
+                    if curr == neighborUp:
+                        score += 1
+                    if curr == neighborLeft:
+                        score += 1
+                    if curr == neighborDown:
+                        score += 1
+                    if curr == neighborRight:
+                        score += 1
+
+        return (score / 48)
 
     def mergeHeuristic(self, grid):
         """ Heuristics that rewards for the same values next to each other """
