@@ -1,5 +1,4 @@
 # CSCI-350-Project-2048
-![2048](https://github.com/marinov98/CSCI-350-Project-2048/blob/CMA-ES/img/8192-best.PNG)
 
 ## AI Final Project
 - Aryan Bhatt
@@ -119,6 +118,9 @@ More specifically, for every state, run a different algorithm that worked well s
 - Store big pieces and ignore the small ones
   - Run a few turns of player’s turn to combine small things (facilitates “ignoring small pieces”)
   - Or just count how many small pieces there are and store that
+  
+## Results
+![2048](https://github.com/marinov98/CSCI-350-Project-2048/blob/CMA-ES/img/8192-best.PNG)
 
 ## Papers/Articles
 - [Using Artifical Intelligent to solve the game of 2048](https://home.cse.ust.hk/~yqsong/teaching/comp3211/projects/2017Fall/G11.pdf)
